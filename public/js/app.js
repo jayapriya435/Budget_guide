@@ -179,17 +179,51 @@ const App = {
       });
     }
 
-    // Google Sign-In -> redirects to Dashboard
+    // Google Sign-In -> redirects to Dashboard with specific diagnostic messages
     const googleBtns = document.querySelectorAll('.google-signin-btn');
     googleBtns.forEach(btn => {
       btn.addEventListener('click', async () => {
         try {
-          await AuthService.loginWithGoogle();
+          btn.disabled = true;
+          const user = await AuthService.loginWithGoogle();
+          if (user) {
+            authModal.classList.remove('modal-open');
+            this.showToast('Signed in with Google!', 'success');
+            this.navigateTo('dashboard');
+          }
+        } catch (err) {
+          console.error("Google Sign-In Error:", err);
+          if (err.code === 'auth/operation-not-allowed' || err.code === 'auth/configuration-not-found') {
+            this.showToast('Google Sign-In is disabled in Firebase Console. Please enable "Google" under Authentication > Sign-in method in Firebase Console.', 'error');
+          } else if (err.code === 'auth/popup-blocked') {
+            this.showToast('Popup window was blocked by your browser. Please allow popups or use Demo Guest mode.', 'error');
+          } else if (err.code === 'auth/unauthorized-domain') {
+            this.showToast(`Domain not authorized. Add ${window.location.hostname} in Firebase Console > Authentication > Settings > Authorized domains.`, 'error');
+          } else if (err.code === 'auth/popup-closed-by-user') {
+            this.showToast('Google sign-in window was closed.', 'info');
+          } else {
+            this.showToast(err.message || 'Google sign-in could not be completed.', 'error');
+          }
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    });
+
+    // Guest / Demo Mode Quick Access
+    const guestBtns = document.querySelectorAll('.guest-signin-btn');
+    guestBtns.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        try {
+          btn.disabled = true;
+          await AuthService.loginAsGuest();
           authModal.classList.remove('modal-open');
-          this.showToast('Signed in with Google!', 'success');
+          this.showToast('Logged in as Guest! Full access enabled.', 'success');
           this.navigateTo('dashboard');
         } catch (err) {
-          this.showToast('Google sign-in cancelled or failed.', 'error');
+          this.showToast('Could not start guest session.', 'error');
+        } finally {
+          btn.disabled = false;
         }
       });
     });

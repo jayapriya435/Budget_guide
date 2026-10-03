@@ -59,16 +59,44 @@ const AuthService = {
         this.currentUser = {
           uid: user.uid,
           email: user.email,
-          displayName: user.displayName || user.email.split('@')[0],
+          displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Smart Planner'),
           photoURL: user.photoURL || null
         };
         localStorage.setItem('ps_local_user', JSON.stringify(this.currentUser));
       } else {
-        this.currentUser = null;
-        localStorage.removeItem('ps_local_user');
+        // If not authenticated via Firebase, check if local guest mode is active
+        const stored = localStorage.getItem('ps_local_user');
+        if (stored) {
+          try {
+            this.currentUser = JSON.parse(stored);
+          } catch (e) {
+            this.currentUser = null;
+          }
+        } else {
+          this.currentUser = null;
+        }
       }
       this.notify();
     });
+
+    // Check redirect result for mobile/popup-blocked browsers
+    if (auth.getRedirectResult) {
+      auth.getRedirectResult().then((result) => {
+        if (result && result.user) {
+          console.log("⚡ PocketSmart AI: Signed in via redirect:", result.user.email);
+          this.currentUser = {
+            uid: result.user.uid,
+            email: result.user.email,
+            displayName: result.user.displayName || result.user.email.split('@')[0],
+            photoURL: result.user.photoURL || null
+          };
+          localStorage.setItem('ps_local_user', JSON.stringify(this.currentUser));
+          this.notify();
+        }
+      }).catch((err) => {
+        console.warn("Redirect authentication note:", err.code, err.message);
+      });
+    }
   },
 
   onStateChange(callback) {
@@ -114,13 +142,54 @@ const AuthService = {
       this.notify();
       return this.currentUser;
     }
-    const result = await auth.signInWithPopup(googleProvider);
-    return result.user;
+
+    try {
+      const result = await auth.signInWithPopup(googleProvider);
+      return result.user;
+    } catch (err) {
+      if (err.code === 'auth/popup-blocked') {
+        console.info("Popup blocked, attempting redirect sign-in...");
+        await auth.signInWithRedirect(googleProvider);
+        return null;
+      }
+      throw err;
+    }
+  },
+
+  async loginAsGuest() {
+    if (isFirebaseInitialized && auth) {
+      try {
+        const cred = await auth.signInAnonymously();
+        if (cred && cred.user) {
+          this.currentUser = {
+            uid: cred.user.uid,
+            email: 'guest@pocketsmart.ai',
+            displayName: 'Guest Planner'
+          };
+          localStorage.setItem('ps_local_user', JSON.stringify(this.currentUser));
+          this.notify();
+          return this.currentUser;
+        }
+      } catch (err) {
+        console.info("Anonymous auth not enabled in console, using offline local guest session.");
+      }
+    }
+
+    this.currentUser = {
+      uid: 'guest_' + Math.random().toString(36).substring(2, 9),
+      email: 'guest@pocketsmart.ai',
+      displayName: 'Guest Planner'
+    };
+    localStorage.setItem('ps_local_user', JSON.stringify(this.currentUser));
+    this.notify();
+    return this.currentUser;
   },
 
   async logout() {
     if (isFirebaseInitialized && auth) {
-      await auth.signOut();
+      try {
+        await auth.signOut();
+      } catch (e) {}
     }
     this.currentUser = null;
     localStorage.removeItem('ps_local_user');
