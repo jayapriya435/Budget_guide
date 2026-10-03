@@ -1,0 +1,21 @@
+{
+  "name": "pocketsmart-ai",
+  "version": "1.0.0",
+  "description": "PocketSmart AI — Smart Budget & Recommendation Assistant for Home Interiors, Events & Jewelry",
+  "type": "module",
+  "scripts": {
+    "test": "node --test scripts/test_client_engine.js",
+    "deploy": "firebase deploy --only hosting"
+  },
+  "keywords": [
+    "budget-planner",
+    "firebase",
+    "gemini-ai",
+    "multimodal",
+    "interior-design",
+    "party-planner",
+    "jewelry-styling"
+  ],
+  "author": "PocketSmart AI Team",
+  "license": "MIT"
+}
