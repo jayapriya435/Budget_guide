@@ -4,12 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PocketSmart AI — Smart Budget & Recommendation Assistant</title>
-  <meta name="description" content="AI-driven budget planning and recommendation assistant for Home Interior, Party Planning, and Jewelry. Powered by Google Gemini AI.">
+  <meta name="description" content="AI-driven budget planning and recommendation assistant for Home Interior, Party Planning, and Jewelry. 100% Firebase & Google Gemini Powered.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/spa.css">
   <style>
+    /* Additional inline touches */
+    .brand span { font-family: 'Outfit', sans-serif; }
+    .hero h1 { font-family: 'Outfit', sans-serif; }
+    .page-header h1 { font-family: 'Outfit', sans-serif; }
     .deploy-badge {
       display: inline-flex;
       align-items: center;
@@ -36,262 +41,612 @@
       70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
-    .status-banner {
-      background: linear-gradient(135deg, #1e1b4b, #0f172a);
-      color: white;
-      padding: 1rem 0;
-      text-align: center;
-      font-size: 0.9rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    .settings-btn-nav {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.25rem;
+      color: var(--gray-600);
+      padding: 0.4rem;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
     }
-    .status-banner a {
-      color: #38bdf8;
-      text-decoration: underline;
-      font-weight: 600;
+    .settings-btn-nav:hover {
+      background: var(--gray-100);
+      color: var(--dark);
     }
   </style>
 </head>
 <body>
-  <!-- Status Banner -->
-  <div class="status-banner">
-    🚀 <strong>PocketSmart AI Production Deployment</strong> • Hosted on Firebase & Google Cloud • Powered by Google Gemini AI
-  </div>
-
   <!-- Header / Navigation -->
   <header class="navbar">
     <div class="container nav-container">
-      <a href="/" class="brand" id="brand-logo">
+      <a href="#landing" class="brand" data-navigate="landing" id="brand-logo">
         <div class="brand-icon">⚡</div>
         <span>PocketSmart <span class="accent">AI</span></span>
       </a>
+
       <ul class="nav-links">
-        <li><a href="#planners">Planners</a></li>
-        <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="#tech-stack">Architecture</a></li>
-        <li><a href="#testimonials">Testimonials</a></li>
+        <li><a href="#landing" data-navigate="landing">Overview</a></li>
+        <li><a href="#home" data-navigate="home">🛋️ Home</a></li>
+        <li><a href="#party" data-navigate="party">🎉 Party</a></li>
+        <li><a href="#jewelry" data-navigate="jewelry">💎 Jewelry</a></li>
+
+        <!-- Unauthenticated state -->
+        <li id="nav-unauthenticated" style="display: flex; gap: 0.75rem; align-items: center;">
+          <button type="button" class="btn btn-secondary open-auth-btn" data-auth-mode="signin">Sign In</button>
+          <button type="button" class="btn btn-primary open-auth-btn" data-auth-mode="signup">Get Started</button>
+        </li>
+
+        <!-- Authenticated state -->
+        <li id="nav-authenticated" style="display: none; gap: 0.75rem; align-items: center;">
+          <a href="#dashboard" data-navigate="dashboard" class="user-menu-badge" title="Go to Dashboard">
+            <span class="user-avatar-circle" id="nav-user-avatar">U</span>
+            <span id="nav-user-name">User</span>
+          </a>
+          <a href="#history" data-navigate="history" class="btn btn-sm btn-secondary">My Plans</a>
+          <button type="button" class="btn btn-sm btn-danger-outline logout-btn">Sign Out</button>
+        </li>
+
+        <!-- Settings Button -->
+        <li>
+          <button type="button" class="settings-btn-nav" id="open-settings-btn" title="API Settings">
+            ⚙️
+          </button>
+        </li>
       </ul>
     </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- Main Views Container -->
   <main>
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="container">
-        <div class="deploy-badge">
-          <span class="pulse-dot"></span> Firebase Hosting Live
+    <!-- ==================== VIEW 1: LANDING ==================== -->
+    <section id="view-landing" class="app-view active">
+      <!-- Hero -->
+      <section class="hero">
+        <div class="container">
+          <div class="deploy-badge">
+            <span class="pulse-dot"></span> 100% Firebase Cloud Native
+          </div>
+          <h1>Plan Smarter. Spend Better.<br><span class="gradient-text">Powered by Gemini AI</span></h1>
+          <p>PocketSmart AI turns your budget into personalized, actionable shopping & service recommendations for Home Interiors, Events, and Jewelry.</p>
+          <div class="hero-actions">
+            <button type="button" class="btn btn-primary" data-navigate="home" id="cta-get-started">Start Planning Free</button>
+            <a href="#planners-overview" class="btn btn-secondary">Explore Planners &darr;</a>
+          </div>
         </div>
-        <h1>Plan Smarter. Spend Better.<br><span class="gradient-text">Powered by Gemini AI</span></h1>
-        <p>PocketSmart AI turns your budget into personalized, actionable shopping & service recommendations for Home Interiors, Events, and Jewelry.</p>
-        <div class="hero-actions">
-          <a href="#planners" class="btn btn-primary" id="cta-get-started">Explore Planners</a>
-          <a href="#tech-stack" class="btn btn-secondary" id="cta-explore">View Architecture</a>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Planners Section -->
-    <section class="section" id="planners">
-      <div class="container">
-        <div class="section-header">
-          <h2>Explore AI Planners</h2>
-          <p>Select your goal, specify your exact budget and preferences, and let our intelligent engine optimize every rupee.</p>
-        </div>
+      <!-- Planners Showcase -->
+      <section class="section" id="planners-overview">
+        <div class="container">
+          <div class="section-header">
+            <h2>Explore AI Planners</h2>
+            <p>Select your goal, specify your exact budget and preferences, and let our intelligent engine optimize every rupee.</p>
+          </div>
 
-        <div class="grid-3">
-          <!-- Home Interior Card -->
-          <div class="card" id="card-home-planner">
-            <div class="card-icon icon-home">🛋️</div>
-            <h3>Home Interior Planner</h3>
-            <p>Design your dream space without blowing your budget. Get room-by-room allocations and curated furniture, lighting, and decor.</p>
-            <ul class="card-features">
-              <li><span>✓</span> Dynamic room & furniture breakdown</li>
-              <li><span>✓</span> Lighting & appliances allocation</li>
-              <li><span>✓</span> Direct links to Amazon, Flipkart & IKEA</li>
-            </ul>
-            <div style="margin-top: 1.5rem;">
-              <span class="badge" style="background:#eef2ff; color:#4f46e5; padding: 0.35rem 0.75rem; border-radius:9999px; font-size:0.8rem; font-weight:600;">FastAPI + Gemini AI</span>
+          <div class="grid-3">
+            <!-- Home Card -->
+            <div class="card" id="card-home-planner">
+              <div class="card-icon icon-home">🛋️</div>
+              <h3>Home Interior Planner</h3>
+              <p>Design your dream space without blowing your budget. Get room-by-room allocations and curated furniture, lighting, and decor.</p>
+              <ul class="card-features">
+                <li><span>✓</span> Dynamic room & furniture breakdown</li>
+                <li><span>✓</span> Lighting & appliances allocation</li>
+                <li><span>✓</span> Direct links to Amazon, Flipkart & IKEA</li>
+              </ul>
+              <button type="button" class="btn btn-secondary" data-navigate="home" style="margin-top: 1.25rem;">
+                Open Home Planner &rarr;
+              </button>
+            </div>
+
+            <!-- Party Card -->
+            <div class="card" id="card-party-planner">
+              <div class="card-icon icon-party">🎉</div>
+              <h3>Party & Event Planner</h3>
+              <p>Host unforgettable birthdays, corporate parties, or weddings. We distribute your budget across catering, venue, decor, and entertainment.</p>
+              <ul class="card-features">
+                <li><span>✓</span> Guest-count calibrated budgeting</li>
+                <li><span>✓</span> Catering & venue recommendations</li>
+                <li><span>✓</span> Swiggy, Zomato & OYO search links</li>
+              </ul>
+              <button type="button" class="btn btn-secondary" data-navigate="party" style="margin-top: 1.25rem;">
+                Open Party Planner &rarr;
+              </button>
+            </div>
+
+            <!-- Jewelry Card -->
+            <div class="card" id="card-jewelry-planner">
+              <div class="card-icon icon-jewelry">💎</div>
+              <h3>Jewelry Planner</h3>
+              <p>Multimodal AI matching. Describe your style or upload an outfit picture to find matching necklaces, earrings, and accessories.</p>
+              <ul class="card-features">
+                <li><span>✓</span> Outfit image color & style analysis</li>
+                <li><span>✓</span> Occasion-specific matching (Weddings, Galas)</li>
+                <li><span>✓</span> Curated shopping recommendations</li>
+              </ul>
+              <button type="button" class="btn btn-secondary" data-navigate="jewelry" style="margin-top: 1.25rem;">
+                Open Jewelry Planner &rarr;
+              </button>
             </div>
           </div>
+        </div>
+      </section>
 
-          <!-- Party Planner Card -->
-          <div class="card" id="card-party-planner">
-            <div class="card-icon icon-party">🎉</div>
-            <h3>Party & Event Planner</h3>
-            <p>Host unforgettable birthdays, corporate parties, or weddings. We distribute your budget across catering, venue, decor, and entertainment.</p>
-            <ul class="card-features">
-              <li><span>✓</span> Guest-count calibrated budgeting</li>
-              <li><span>✓</span> Catering & venue recommendations</li>
-              <li><span>✓</span> Swiggy, Zomato & OYO search links</li>
-            </ul>
-            <div style="margin-top: 1.5rem;">
-              <span class="badge" style="background:#ecfdf5; color:#059669; padding: 0.35rem 0.75rem; border-radius:9999px; font-size:0.8rem; font-weight:600;">FastAPI + Gemini AI</span>
+      <!-- Architecture Table -->
+      <section class="section" style="background: white;">
+        <div class="container">
+          <div class="section-header">
+            <h2>100% Firebase Architecture</h2>
+            <p>Serverless, real-time, and ultra-fast. No servers or containers to maintain.</p>
+          </div>
+
+          <div style="max-width: 860px; margin: 0 auto; overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+              <thead>
+                <tr style="background: linear-gradient(135deg, #0f172a, #1e1b4b); color: white;">
+                  <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.95rem;">Layer</th>
+                  <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.95rem;">Firebase & AI Technology</th>
+                  <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.95rem;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                  <td style="padding: 0.9rem 1.5rem; font-weight: 600; color: #1e293b;">Hosting</td>
+                  <td style="padding: 0.9rem 1.5rem; color: #475569;">Firebase Hosting (Global Edge CDN)</td>
+                  <td style="padding: 0.9rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Live</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;">
+                  <td style="padding: 0.9rem 1.5rem; font-weight: 600; color: #1e293b;">Authentication</td>
+                  <td style="padding: 0.9rem 1.5rem; color: #475569;">Firebase Authentication (Email/Password & Google)</td>
+                  <td style="padding: 0.9rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Active</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                  <td style="padding: 0.9rem 1.5rem; font-weight: 600; color: #1e293b;">Database</td>
+                  <td style="padding: 0.9rem 1.5rem; color: #475569;">Cloud Firestore (Real-Time Plan Persistence)</td>
+                  <td style="padding: 0.9rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Integrated</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;">
+                  <td style="padding: 0.9rem 1.5rem; font-weight: 600; color: #1e293b;">Image Storage</td>
+                  <td style="padding: 0.9rem 1.5rem; color: #475569;">Firebase Storage (Outfit Photo Uploads)</td>
+                  <td style="padding: 0.9rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Integrated</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                  <td style="padding: 0.9rem 1.5rem; font-weight: 600; color: #1e293b;">AI Engine</td>
+                  <td style="padding: 0.9rem 1.5rem; color: #475569;">Google Gemini API (REST + Multimodal Vision)</td>
+                  <td style="padding: 0.9rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Connected</span></td>
+                </tr>
+                <tr style="background: #fafafa;">
+                  <td style="padding: 0.9rem 1.5rem; font-weight: 600; color: #1e293b;">External Links</td>
+                  <td style="padding: 0.9rem 1.5rem; color: #475569;">Amazon, Flipkart, IKEA, Swiggy, Zomato, OYO</td>
+                  <td style="padding: 0.9rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Verified</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Testimonials -->
+      <section class="section" id="testimonials">
+        <div class="container">
+          <div class="section-header">
+            <h2>Loved by Smart Planners</h2>
+            <p>See how real users furnished homes and hosted parties without overspending.</p>
+          </div>
+
+          <div class="grid-3">
+            <div class="testimonial-card">
+              <p class="testimonial-quote">"Furnished my 2BHK living room with a strict ₹60,000 budget. PocketSmart AI gave me exact sofa and lighting options with money left over."</p>
+              <div class="testimonial-author">
+                <div class="author-avatar">AP</div>
+                <div class="author-info">
+                  <h5>Ananya P.</h5>
+                  <span>Bangalore • Home Planner</span>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <!-- Jewelry Planner Card -->
-          <div class="card" id="card-jewelry-planner">
-            <div class="card-icon icon-jewelry">💎</div>
-            <h3>Jewelry Planner</h3>
-            <p>Multimodal AI matching. Describe your style or upload an outfit picture to find matching necklaces, earrings, and accessories.</p>
-            <ul class="card-features">
-              <li><span>✓</span> Outfit image color & style analysis</li>
-              <li><span>✓</span> Occasion-specific matching (Weddings, Galas)</li>
-              <li><span>✓</span> Curated shopping recommendations</li>
-            </ul>
-            <div style="margin-top: 1.5rem;">
-              <span class="badge" style="background:#fdf4ff; color:#c026d3; padding: 0.35rem 0.75rem; border-radius:9999px; font-size:0.8rem; font-weight:600;">Pillow + Gemini Multimodal</span>
+            <div class="testimonial-card">
+              <p class="testimonial-quote">"Organized a 50-person corporate celebration. The catering and venue suggestions saved us at least ₹25,000 compared to external event agencies."</p>
+              <div class="testimonial-author">
+                <div class="author-avatar">RK</div>
+                <div class="author-info">
+                  <h5>Rahul K.</h5>
+                  <span>Hyderabad • Party Planner</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- Architecture Section -->
-    <section class="section" id="tech-stack" style="background: white;">
-      <div class="container">
-        <div class="section-header">
-          <h2>Production Architecture</h2>
-          <p>Built strictly according to enterprise cloud-native standards.</p>
-        </div>
-
-        <div style="max-width: 900px; margin: 0 auto; overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-            <thead>
-              <tr style="background: linear-gradient(135deg, #0f172a, #1e1b4b); color: white;">
-                <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.95rem;">Layer</th>
-                <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.95rem;">Technology Stack</th>
-                <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.95rem;">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Frontend</td>
-                <td style="padding: 1rem 1.5rem; color: #475569;">HTML + CSS + JavaScript + Jinja2</td>
-                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Ready</span></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;">
-                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Backend</td>
-                <td style="padding: 1rem 1.5rem; color: #475569;">FastAPI + Python 3.11</td>
-                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Ready</span></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">AI Engine</td>
-                <td style="padding: 1rem 1.5rem; color: #475569;">Google Gemini API (3.5 Flash Lite Cascade)</td>
-                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Active</span></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;">
-                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Database</td>
-                <td style="padding: 1rem 1.5rem; color: #475569;">Google Cloud Firestore (NoSQL)</td>
-                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Integrated</span></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Authentication</td>
-                <td style="padding: 1rem 1.5rem; color: #475569;">FastAPI JWT Authentication + Bcrypt</td>
-                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Ready</span></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;">
-                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Image Processing</td>
-                <td style="padding: 1rem 1.5rem; color: #475569;">Pillow + Gemini Multimodal Vision</td>
-                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Ready</span></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Backend Hosting</td>
-                <td style="padding: 1rem 1.5rem; color: #475569;">Google Cloud Run (asia-south1)</td>
-                <td style="padding: 1rem 1.5rem;"><span style="color:#2563eb; font-weight:600;">⚡ Dockerized</span></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;">
-                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Frontend Hosting</td>
-                <td style="padding: 1rem 1.5rem; color: #475569;">Firebase Hosting (pocketsmartai-app.web.app)</td>
-                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Live</span></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Storage</td>
-                <td style="padding: 1rem 1.5rem; color: #475569;">Firebase Storage / Cloud Storage</td>
-                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Integrated</span></td>
-              </tr>
-              <tr style="background: #fafafa;">
-                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Source Control</td>
-                <td style="padding: 1rem 1.5rem; color: #475569;">GitHub (Git initialized)</td>
-                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Initialized</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section class="section how-it-works" id="how-it-works">
-      <div class="container">
-        <div class="section-header">
-          <h2>How PocketSmart AI Works</h2>
-          <p>Three simple steps from budget constraint to complete shopping list.</p>
-        </div>
-
-        <div class="steps-grid">
-          <div class="step-item">
-            <div class="step-number">1</div>
-            <h4>Set Your Budget</h4>
-            <p>Enter your target spend limit and specify the items, rooms, or occasion details you need.</p>
-          </div>
-
-          <div class="step-item">
-            <div class="step-number">2</div>
-            <h4>AI Calculates & Curates</h4>
-            <p>Gemini AI breaks down allocations mathematically and matches products within each sub-budget.</p>
-          </div>
-
-          <div class="step-item">
-            <div class="step-number">3</div>
-            <h4>Save & Purchase</h4>
-            <p>Review recommendations, check verified platform links, save plans to your history, and buy with confidence.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="section" id="testimonials">
-      <div class="container">
-        <div class="section-header">
-          <h2>Loved by Smart Planners</h2>
-          <p>See how real users furnished homes and hosted parties without overspending.</p>
-        </div>
-
-        <div class="grid-3">
-          <div class="testimonial-card">
-            <p class="testimonial-quote">"Furnished my 2BHK living room with a strict ₹60,000 budget. PocketSmart AI gave me exact sofa and lighting options with money left over."</p>
-            <div class="testimonial-author">
-              <div class="author-avatar">AP</div>
-              <div class="author-info">
-                <h5>Ananya P.</h5>
-                <span>Bangalore • Home Planner</span>
+            <div class="testimonial-card">
+              <p class="testimonial-quote">"I uploaded a picture of my wedding reception lehenga and it recommended jewelry that matched the emerald undertones perfectly within my budget."</p>
+              <div class="testimonial-author">
+                <div class="author-avatar">SM</div>
+                <div class="author-info">
+                  <h5>Sneha M.</h5>
+                  <span>Mumbai • Jewelry Planner</span>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+    </section>
 
-          <div class="testimonial-card">
-            <p class="testimonial-quote">"Organized a 50-person corporate celebration. The catering and venue suggestions saved us at least ₹25,000 compared to external event agencies."</p>
-            <div class="testimonial-author">
-              <div class="author-avatar">RK</div>
-              <div class="author-info">
-                <h5>Rahul K.</h5>
-                <span>Hyderabad • Party Planner</span>
+    <!-- ==================== VIEW 2: HOME PLANNER ==================== -->
+    <section id="view-home" class="app-view">
+      <div class="page-header">
+        <div class="container">
+          <span class="header-badge">🛋️ Home Interior Budgeting</span>
+          <h1>Design Your Dream Space</h1>
+          <p>Tell us your room specs and budget limit. Gemini AI allocates budget by category and curates furniture & decor.</p>
+        </div>
+      </div>
+
+      <div class="planner-container">
+        <div class="planner-card">
+          <form id="form-home-planner">
+            <div class="form-group">
+              <label for="home-budget">
+                Total Budget
+                <span class="label-hint">Enter your maximum spend limit</span>
+              </label>
+              <div class="input-currency-wrap">
+                <span class="currency-prefix">₹</span>
+                <input type="number" id="home-budget" class="form-control" placeholder="e.g. 75000" min="1000" step="500" value="75000" required>
               </div>
             </div>
-          </div>
 
-          <div class="testimonial-card">
-            <p class="testimonial-quote">"I uploaded a picture of my wedding reception lehenga and it recommended jewelry that matched the emerald undertones perfectly within my budget."</p>
-            <div class="testimonial-author">
-              <div class="author-avatar">SM</div>
-              <div class="author-info">
-                <h5>Sneha M.</h5>
-                <span>Mumbai • Jewelry Planner</span>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="home-room-type">Room Type</label>
+                <select id="home-room-type" class="form-control">
+                  <option value="Living Room" selected>Living Room</option>
+                  <option value="Master Bedroom">Master Bedroom</option>
+                  <option value="Kids Bedroom">Kids Bedroom</option>
+                  <option value="Kitchen & Dining">Kitchen & Dining</option>
+                  <option value="Home Office / Study">Home Office / Study</option>
+                  <option value="Complete 2BHK Apartment">Complete 2BHK Apartment</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="home-style">Interior Style Preference</label>
+                <select id="home-style" class="form-control">
+                  <option value="Modern Minimalist" selected>Modern Minimalist</option>
+                  <option value="Scandinavian Light">Scandinavian Light</option>
+                  <option value="Contemporary Indian">Contemporary Indian</option>
+                  <option value="Bohemian Warm">Bohemian Warm</option>
+                  <option value="Industrial Raw">Industrial Raw</option>
+                  <option value="Luxury Contemporary">Luxury Contemporary</option>
+                </select>
               </div>
             </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="home-sofa">Sofa Requirement</label>
+                <select id="home-sofa" class="form-control">
+                  <option value="3-Seater Fabric Sofa" selected>3-Seater Fabric Sofa</option>
+                  <option value="L-Shape Sectional">L-Shape Sectional</option>
+                  <option value="2-Seater Loveseat">2-Seater Loveseat</option>
+                  <option value="Recliner Chair">Recliner Chair</option>
+                  <option value="None">None / Already have</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="home-dining">Dining Table</label>
+                <select id="home-dining" class="form-control">
+                  <option value="None" selected>None</option>
+                  <option value="4-Seater Dining Set">4-Seater Dining Set</option>
+                  <option value="6-Seater Dining Set">6-Seater Dining Set</option>
+                  <option value="Compact Folding Table">Compact Folding Table</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="home-lights">Lights Count</label>
+                <input type="number" id="home-lights" class="form-control" value="4" min="0" max="20">
+              </div>
+
+              <div class="form-group">
+                <label for="home-fans">Ceiling Fans</label>
+                <input type="number" id="home-fans" class="form-control" value="1" min="0" max="6">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="home-notes">Special Requirements / Notes (Optional)</label>
+              <textarea id="home-notes" class="form-control" rows="2" placeholder="e.g. Need pet-friendly fabric, space for 55-inch TV wall mount..."></textarea>
+            </div>
+
+            <input type="hidden" id="home-room-count" value="1">
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+              ✨ Generate Home Interior Plan
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: PARTY PLANNER ==================== -->
+    <section id="view-party" class="app-view">
+      <div class="page-header">
+        <div class="container">
+          <span class="header-badge">🎉 Event & Celebration Budgeting</span>
+          <h1>Host Unforgettable Moments</h1>
+          <p>Calibrate your budget across catering, venue, decor, and entertainment with exact guest-count math.</p>
+        </div>
+      </div>
+
+      <div class="planner-container">
+        <div class="planner-card">
+          <form id="form-party-planner">
+            <div class="form-group">
+              <label for="party-budget">
+                Total Budget
+                <span class="label-hint">All-inclusive event target spend</span>
+              </label>
+              <div class="input-currency-wrap">
+                <span class="currency-prefix">₹</span>
+                <input type="number" id="party-budget" class="form-control" placeholder="e.g. 50000" min="2000" step="500" value="50000" required>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="party-event-type">Occasion / Event Type</label>
+                <select id="party-event-type" class="form-control">
+                  <option value="Birthday Party" selected>Birthday Party</option>
+                  <option value="Anniversary Celebration">Anniversary Celebration</option>
+                  <option value="Corporate Team Gathering">Corporate Team Gathering</option>
+                  <option value="Wedding Sangeet / Mehendi">Wedding Sangeet / Mehendi</option>
+                  <option value="Housewarming Party">Housewarming Party</option>
+                  <option value="Casual Dinner Get-Together">Casual Dinner Get-Together</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="party-guests">Estimated Guest Count</label>
+                <input type="number" id="party-guests" class="form-control" value="30" min="5" max="500" required>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="party-venue">Venue Preference</label>
+                <select id="party-venue" class="form-control">
+                  <option value="Home / Backyard" selected>Home / Backyard (Free Venue)</option>
+                  <option value="Rooftop Cafe / Restaurant">Rooftop Cafe / Restaurant</option>
+                  <option value="Banquet Hall / Party Lounge">Banquet Hall / Party Lounge</option>
+                  <option value="Outdoor Garden Lawn">Outdoor Garden Lawn</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="party-food">Food & Catering Style</label>
+                <select id="party-food" class="form-control">
+                  <option value="Multi-Course Buffet (Veg & Non-Veg)" selected>Multi-Course Buffet (Veg & Non-Veg)</option>
+                  <option value="Pure Veg Traditional Feast">Pure Veg Traditional Feast</option>
+                  <option value="Finger Foods & High Tea Spread">Finger Foods & High Tea Spread</option>
+                  <option value="Pizza & Party Finger Bites">Pizza & Party Finger Bites</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="party-theme">Decoration & Theme</label>
+                <select id="party-theme" class="form-control">
+                  <option value="Gold & Black Elegance" selected>Gold & Black Elegance</option>
+                  <option value="Pastel Floral Charm">Pastel Floral Charm</option>
+                  <option value="Neon Glow Party">Neon Glow Party</option>
+                  <option value="Traditional Marigold Festive">Traditional Marigold Festive</option>
+                  <option value="Boho Chic Rustic">Boho Chic Rustic</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="party-entertainment">Music & Entertainment</label>
+                <select id="party-entertainment" class="form-control">
+                  <option value="Bluetooth Speaker & Curated Playlist" selected>Bluetooth Speaker & Playlist</option>
+                  <option value="Live DJ with Sound System">Live DJ with Sound System</option>
+                  <option value="Acoustic Singer / Guitarist">Acoustic Singer / Guitarist</option>
+                  <option value="Karaoke Mic Setup">Karaoke Mic Setup</option>
+                  <option value="None">None</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="party-notes">Additional Requests (Optional)</label>
+              <textarea id="party-notes" class="form-control" rows="2" placeholder="e.g. Need gluten-free options, custom 2kg photo cake..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+              ✨ Generate Event Budget & Plan
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: JEWELRY PLANNER ==================== -->
+    <section id="view-jewelry" class="app-view">
+      <div class="page-header">
+        <div class="container">
+          <span class="header-badge">💎 Multimodal Jewelry Stylist</span>
+          <h1>Match Your Attire with AI</h1>
+          <p>Upload a photo of your outfit or describe your occasion. Gemini AI matches necklaces, earrings, and bangles within your budget.</p>
+        </div>
+      </div>
+
+      <div class="planner-container">
+        <div class="planner-card">
+          <form id="form-jewelry-planner">
+            <div class="form-group">
+              <label for="jewelry-budget">
+                Jewelry Budget
+                <span class="label-hint">Total budget for the set</span>
+              </label>
+              <div class="input-currency-wrap">
+                <span class="currency-prefix">₹</span>
+                <input type="number" id="jewelry-budget" class="form-control" placeholder="e.g. 35000" min="500" step="500" value="35000" required>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="jewelry-occasion">Occasion</label>
+                <select id="jewelry-occasion" class="form-control">
+                  <option value="Wedding Reception" selected>Wedding Reception</option>
+                  <option value="Bridal Sangeet">Bridal Sangeet</option>
+                  <option value="Diwali / Festive Party">Diwali / Festive Party</option>
+                  <option value="Engagement Ceremony">Engagement Ceremony</option>
+                  <option value="Formal Evening Gala">Formal Evening Gala</option>
+                  <option value="Daily Office Wear">Daily Office Wear</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="jewelry-style">Preferred Jewelry Style</label>
+                <select id="jewelry-style" class="form-control">
+                  <option value="Traditional Kundan & Pearls" selected>Traditional Kundan & Pearls</option>
+                  <option value="Temple Gold-Toned Antique">Temple Gold-Toned Antique</option>
+                  <option value="Polki & Meenakari Royal">Polki & Meenakari Royal</option>
+                  <option value="Modern Minimalist Diamond-look">Modern Minimalist Diamond-look</option>
+                  <option value="Contemporary Oxidized Silver">Contemporary Oxidized Silver</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Multimodal Outfit Image Upload -->
+            <div class="form-group">
+              <label>
+                Upload Outfit Photo (Optional for AI Vision Matching)
+                <span class="label-hint">Gemini analyzes neckline, fabric color & embroidery</span>
+              </label>
+              <label for="jewelry-outfit-image" class="file-upload-dropzone">
+                <div class="dropzone-icon">📷</div>
+                <div class="dropzone-text">Click to choose outfit picture</div>
+                <div class="dropzone-sub">Supports JPEG, PNG, WebP (Uploaded to Firebase Storage)</div>
+                <input type="file" id="jewelry-outfit-image" accept="image/jpeg,image/png,image/webp" style="display: none;">
+              </label>
+              <div id="jewelry-image-preview"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="jewelry-outfit-desc">Outfit Description / Color</label>
+              <input type="text" id="jewelry-outfit-desc" class="form-control" placeholder="e.g. Emerald green silk saree with gold zari border and sweetheart neckline">
+            </div>
+
+            <div class="form-group">
+              <label for="jewelry-types">Pieces Needed</label>
+              <select id="jewelry-types" class="form-control">
+                <option value="Necklace & Earrings Set" selected>Necklace & Earrings Set</option>
+                <option value="Full Bridal Ensemble (Necklace, Earrings, Maang Tikka, Bangles)">Full Bridal Ensemble (Necklace, Earrings, Maang Tikka, Bangles)</option>
+                <option value="Choker, Jhumkas & Bangles">Choker, Jhumkas & Bangles</option>
+                <option value="Statement Earrings & Cocktails Rings Only">Statement Earrings & Cocktails Rings Only</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="jewelry-notes">Special Preferences (Optional)</label>
+              <textarea id="jewelry-notes" class="form-control" rows="2" placeholder="e.g. Prefer lightweight earrings, nickel-free alloy for sensitive skin..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+              ✨ Style My Jewelry Ensemble
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 5: RESULTS ==================== -->
+    <section id="view-results" class="app-view">
+      <div class="page-header" style="padding: 2.5rem 0 1.5rem;">
+        <div class="container">
+          <span class="header-badge">⚡ Recommendation Ready</span>
+          <h1>Your Smart Plan</h1>
+          <p>Curated recommendations calibrated mathematically to your spend limit.</p>
+        </div>
+      </div>
+
+      <div class="results-content" id="results-content">
+        <!-- Injected dynamically by App.renderResults -->
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 6: DASHBOARD ==================== -->
+    <section id="view-dashboard" class="app-view">
+      <div class="page-header" style="padding: 3rem 0 2rem;">
+        <div class="container">
+          <span class="header-badge">📊 Cloud Control Center</span>
+          <h1>Planner Dashboard</h1>
+          <p>All your saved recommendations synced with Cloud Firestore.</p>
+        </div>
+      </div>
+
+      <div class="dashboard-container">
+        <!-- Stats Row -->
+        <div class="dashboard-stats-grid" id="dashboard-stats-row">
+          <div class="stat-card">
+            <span class="stat-label">Total Plans</span>
+            <span class="stat-value">0</span>
           </div>
+          <div class="stat-card">
+            <span class="stat-label">Total Budget</span>
+            <span class="stat-value">₹0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Saved Money</span>
+            <span class="stat-value text-success">₹0</span>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--dark);">Recent Recommendations</h3>
+          <a href="#history" data-navigate="history" class="btn btn-sm btn-outline-primary">View All History &rarr;</a>
+        </div>
+
+        <div class="plan-history-grid" id="dashboard-recent-list">
+          <!-- Recent cards injected dynamically -->
+        </div>
+
+        <!-- Quick Start Planners -->
+        <div style="margin-top: 3rem; background: white; padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--gray-200);">
+          <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">Start a New Budget Plan</h3>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn btn-primary" data-navigate="home">🛋️ Home Interior</button>
+            <button class="btn btn-secondary" data-navigate="party">🎉 Party & Event</button>
+            <button class="btn btn-secondary" data-navigate="jewelry">💎 Jewelry Ensemble</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 7: HISTORY ==================== -->
+    <section id="view-history" class="app-view">
+      <div class="page-header" style="padding: 3rem 0 2rem;">
+        <div class="container">
+          <span class="header-badge">📂 Cloud Firestore History</span>
+          <h1>My Saved Plans</h1>
+          <p>Browse, export, and review your historical budget calculations.</p>
+        </div>
+      </div>
+
+      <div class="history-container">
+        <div class="plan-history-grid" id="history-list">
+          <!-- History cards injected dynamically -->
         </div>
       </div>
     </section>
@@ -300,15 +655,137 @@
   <!-- Footer -->
   <footer>
     <div class="container footer-content">
-      <p>&copy; 2026 PocketSmart AI. Budget-aware recommendation assistant.</p>
+      <p>&copy; 2026 PocketSmart AI. Budget-aware recommendation assistant on Firebase & Google Gemini.</p>
       <ul class="footer-links">
-        <li><a href="#planners">Planners</a></li>
-        <li><a href="#tech-stack">Architecture</a></li>
-        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#home" data-navigate="home">Home Planner</a></li>
+        <li><a href="#party" data-navigate="party">Party Planner</a></li>
+        <li><a href="#jewelry" data-navigate="jewelry">Jewelry Planner</a></li>
+        <li><a href="#dashboard" data-navigate="dashboard">Dashboard</a></li>
       </ul>
     </div>
   </footer>
 
-  <script src="/js/main.js"></script>
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 1. Auth Modal -->
+  <div class="modal-backdrop" id="auth-modal">
+    <div class="modal-dialog">
+      <button type="button" class="modal-close-btn" id="close-auth-modal">&times;</button>
+      <div class="modal-header">
+        <h3>PocketSmart AI</h3>
+        <p>Sign in to sync your plans across devices with Cloud Firestore</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" data-auth-tab="signin">Sign In</button>
+        <button type="button" class="auth-tab-btn" data-auth-tab="signup">Create Account</button>
+      </div>
+
+      <!-- Sign In Tab -->
+      <div id="signin-tab-content">
+        <form id="signin-form">
+          <div class="form-group">
+            <label for="signin-email">Email Address</label>
+            <input type="email" id="signin-email" class="form-control" placeholder="name@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="signin-password">Password</label>
+            <input type="password" id="signin-password" class="form-control" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+        </form>
+      </div>
+
+      <!-- Sign Up Tab -->
+      <div id="signup-tab-content" style="display: none;">
+        <form id="signup-form">
+          <div class="form-group">
+            <label for="signup-name">Full Name</label>
+            <input type="text" id="signup-name" class="form-control" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <label for="signup-email">Email Address</label>
+            <input type="email" id="signup-email" class="form-control" placeholder="name@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="signup-password">Password</label>
+            <input type="password" id="signup-password" class="form-control" placeholder="Min. 6 characters" minlength="6" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+        </form>
+      </div>
+
+      <div class="auth-divider">or continue with</div>
+
+      <button type="button" class="btn-google google-signin-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+        Sign in with Google
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. Settings Modal (Gemini API Key) -->
+  <div class="modal-backdrop" id="settings-modal">
+    <div class="modal-dialog">
+      <button type="button" class="modal-close-btn" id="close-settings-modal">&times;</button>
+      <div class="modal-header">
+        <h3>⚙️ AI Engine Settings</h3>
+        <p>Configure your Google Gemini API key for personalized live generation.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="gemini-api-key-input">
+          Google Gemini API Key
+          <span class="label-hint">From Google AI Studio</span>
+        </label>
+        <input type="password" id="gemini-api-key-input" class="form-control" placeholder="AIzaSy...">
+        <span style="font-size: 0.75rem; color: var(--gray-400); display: block; margin-top: 0.35rem;">
+          Stored locally in your browser. Get a key at <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary);">aistudio.google.com</a>.
+        </span>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary" id="test-api-key-btn" style="flex: 1;">
+          Test Connection
+        </button>
+        <button type="button" class="btn btn-primary" id="save-api-key-btn" style="flex: 1;">
+          Save Key
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. AI Generation Loading Overlay -->
+  <div id="ai-loading-overlay" class="loading-overlay">
+    <div class="loading-modal">
+      <div class="loading-spinner"></div>
+      <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--dark); margin-bottom: 0.5rem;">
+        Creating Your Smart Plan ✨
+      </h3>
+      <p id="loading-step-text" style="color: var(--text-secondary); font-size: 0.95rem; min-height: 1.5rem; margin-bottom: 1.25rem;">
+        Analyzing budget and room specifications...
+      </p>
+      <div class="loading-bar-track">
+        <div id="loading-bar-fill" class="loading-bar-fill"></div>
+      </div>
+      <span style="font-size: 0.75rem; color: var(--gray-400); display: block; margin-top: 1rem;">
+        PocketSmart AI • Gemini Intelligence
+      </span>
+    </div>
+  </div>
+
+  <!-- 4. Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Firebase SDKs (Compat v10 for universal browser support) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+  <!-- PocketSmart Application Modules -->
+  <script src="/js/firebase-config.js"></script>
+  <script src="/js/gemini-service.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 </html>
