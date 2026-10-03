@@ -1,17 +1,21 @@
 /**
  * PocketSmart AI — Master Application Controller
- * Handles SPA routing, interactive planners, results rendering, history management,
- * auth state UI, and toast notifications.
+ * Handles SPA routing, dynamic multi-room planner forms, interactive results,
+ * plan reuse, history filtering, auth state flow, and toast notifications.
+ * Fully aligned with PocketSmart AI Product Specification.
  */
 
 const App = {
   currentPlan: null,
   activeView: 'landing',
+  historyFilter: 'all',
+  additionalRoomCount: 0,
 
   init() {
     this.bindNavigation();
     this.bindAuthEvents();
     this.bindPlannerForms();
+    this.bindDynamicRoomBuilder();
     this.bindSettings();
     this.handleInitialRoute();
 
@@ -97,7 +101,7 @@ const App = {
     }, 3500);
   },
 
-  // ==================== Auth Modal & State ====================
+  // ==================== Auth Modal & Flow (Section 0.4) ====================
   bindAuthEvents() {
     const authModal = document.getElementById('auth-modal');
     const openBtns = document.querySelectorAll('.open-auth-btn');
@@ -122,7 +126,7 @@ const App = {
       });
     });
 
-    // Sign In Form
+    // Sign In Form -> redirects to Dashboard per spec
     const signinForm = document.getElementById('signin-form');
     if (signinForm) {
       signinForm.addEventListener('submit', async (e) => {
@@ -137,6 +141,8 @@ const App = {
           await AuthService.login(email, pass);
           authModal.classList.remove('modal-open');
           this.showToast('Welcome back! Successfully signed in.', 'success');
+          // Navigate to dashboard per spec Section 0.4
+          this.navigateTo('dashboard');
         } catch (err) {
           this.showToast(err.message || 'Login failed. Please check credentials.', 'error');
         } finally {
@@ -146,7 +152,7 @@ const App = {
       });
     }
 
-    // Sign Up Form
+    // Sign Up Form -> redirects to Dashboard per spec
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
       signupForm.addEventListener('submit', async (e) => {
@@ -162,6 +168,8 @@ const App = {
           await AuthService.register(email, pass, name);
           authModal.classList.remove('modal-open');
           this.showToast('Account created successfully!', 'success');
+          // Navigate to dashboard per spec Section 0.4
+          this.navigateTo('dashboard');
         } catch (err) {
           this.showToast(err.message || 'Registration failed.', 'error');
         } finally {
@@ -171,7 +179,7 @@ const App = {
       });
     }
 
-    // Google Sign-In
+    // Google Sign-In -> redirects to Dashboard
     const googleBtns = document.querySelectorAll('.google-signin-btn');
     googleBtns.forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -179,13 +187,14 @@ const App = {
           await AuthService.loginWithGoogle();
           authModal.classList.remove('modal-open');
           this.showToast('Signed in with Google!', 'success');
+          this.navigateTo('dashboard');
         } catch (err) {
           this.showToast('Google sign-in cancelled or failed.', 'error');
         }
       });
     });
 
-    // Logout
+    // Logout -> redirects to Landing
     const logoutBtns = document.querySelectorAll('.logout-btn');
     logoutBtns.forEach(btn => {
       btn.addEventListener('click', async (e) => {
@@ -210,36 +219,141 @@ const App = {
     const authNav = document.getElementById('nav-authenticated');
     const userNameSpan = document.getElementById('nav-user-name');
     const userAvatar = document.getElementById('nav-user-avatar');
+    const welcomeHeading = document.getElementById('dashboard-welcome-heading');
 
     if (user) {
       if (unauthNav) unauthNav.style.display = 'none';
       if (authNav) authNav.style.display = 'flex';
-      if (userNameSpan) userNameSpan.textContent = user.displayName || user.email;
+      const displayName = user.displayName || user.email.split('@')[0];
+      if (userNameSpan) userNameSpan.textContent = displayName;
       if (userAvatar) {
-        userAvatar.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+        userAvatar.textContent = displayName.charAt(0).toUpperCase();
+      }
+      if (welcomeHeading) {
+        welcomeHeading.textContent = `Welcome back, ${displayName}! 👋`;
       }
     } else {
       if (unauthNav) unauthNav.style.display = 'flex';
       if (authNav) authNav.style.display = 'none';
+      if (welcomeHeading) {
+        welcomeHeading.textContent = `Welcome, Smart Planner! 👋`;
+      }
+    }
+  },
+
+  // ==================== Dynamic Room Builder (Section 8.2) ====================
+  bindDynamicRoomBuilder() {
+    const addRoomBtn = document.getElementById('btn-add-extra-room');
+    const container = document.getElementById('additional-rooms-container');
+
+    if (addRoomBtn && container) {
+      addRoomBtn.addEventListener('click', () => {
+        this.additionalRoomCount++;
+        const roomId = `room-${this.additionalRoomCount}`;
+        const roomCard = document.createElement('div');
+        roomCard.className = 'extra-room-card';
+        roomCard.id = roomId;
+        roomCard.innerHTML = `
+          <div class="extra-room-header">
+            <h4>🛋️ Additional Room #${this.additionalRoomCount + 1}</h4>
+            <button type="button" class="btn-remove-room" onclick="App.removeRoom('${roomId}')" title="Remove Room">&times; Remove</button>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Room Type</label>
+              <select class="form-control extra-room-type">
+                <option value="Bedroom" selected>Bedroom</option>
+                <option value="Kids Bedroom">Kids Bedroom</option>
+                <option value="Dining Room">Dining Room</option>
+                <option value="Study / Home Office">Study / Home Office</option>
+                <option value="Balcony / Outdoor Nook">Balcony / Outdoor Nook</option>
+                <option value="Guest Bedroom">Guest Bedroom</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Key Furniture Required</label>
+              <select class="form-control extra-room-furniture">
+                <option value="Queen Size Bed + Wardrobe" selected>Queen Size Bed + Wardrobe</option>
+                <option value="Kids Bunk Bed + Study Desk">Kids Bunk Bed + Study Desk</option>
+                <option value="Ergonomic Desk + Office Chair">Ergonomic Desk + Office Chair</option>
+                <option value="Wardrobe & Dresser">Wardrobe & Dresser</option>
+                <option value="Coffee Seating + Planters">Coffee Seating + Planters</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Lights Count</label>
+              <input type="number" class="form-control extra-room-lights" value="2" min="1" max="10">
+            </div>
+            <div class="form-group">
+              <label>Ceiling Fans</label>
+              <input type="number" class="form-control extra-room-fans" value="1" min="0" max="4">
+            </div>
+          </div>
+        `;
+        container.appendChild(roomCard);
+        this.showToast(`Added Room #${this.additionalRoomCount + 1}`, 'info');
+      });
+    }
+  },
+
+  removeRoom(roomId) {
+    const el = document.getElementById(roomId);
+    if (el) {
+      el.remove();
+      this.showToast('Room removed.', 'info');
     }
   },
 
   // ==================== Planner Form Handlers ====================
   bindPlannerForms() {
-    // 1. Home Interior Planner Form
+    // 1. Home Interior Planner Form (Section 8.1 - 8.5)
     const homeForm = document.getElementById('form-home-planner');
     if (homeForm) {
       homeForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // Collect primary room
+        const primaryRoom = {
+          type: document.getElementById('home-room-type').value,
+          sofa: document.getElementById('home-sofa').value,
+          dining: document.getElementById('home-dining').value,
+          lights: parseInt(document.getElementById('home-lights').value, 10) || 4,
+          fans: parseInt(document.getElementById('home-fans').value, 10) || 1
+        };
+
+        // Collect additional dynamic rooms (Section 8.2)
+        const additionalRooms = [];
+        document.querySelectorAll('.extra-room-card').forEach(card => {
+          additionalRooms.push({
+            type: card.querySelector('.extra-room-type')?.value || 'Bedroom',
+            furniture: card.querySelector('.extra-room-furniture')?.value || 'Bed + Wardrobe',
+            lights: parseInt(card.querySelector('.extra-room-lights')?.value, 10) || 2,
+            fans: parseInt(card.querySelector('.extra-room-fans')?.value, 10) || 1
+          });
+        });
+
+        // Collect extra requirements / decor checkboxes
+        const extraRequirements = [];
+        if (document.getElementById('home-req-tv')?.checked) extraRequirements.push('TV Unit');
+        if (document.getElementById('home-req-curtains')?.checked) extraRequirements.push('Curtains & Drapes');
+        if (document.getElementById('home-req-rug')?.checked) extraRequirements.push('Floor Rug / Carpet');
+        if (document.getElementById('home-req-plants')?.checked) extraRequirements.push('Indoor Plants & Planters');
+
+        const totalRooms = 1 + additionalRooms.length;
+
         const data = {
           budget: parseFloat(document.getElementById('home-budget').value),
-          room_type: document.getElementById('home-room-type').value,
-          room_count: parseInt(document.getElementById('home-room-count').value, 10) || 1,
-          lights_count: parseInt(document.getElementById('home-lights').value, 10) || 4,
-          fans_count: parseInt(document.getElementById('home-fans').value, 10) || 1,
-          sofa_requirement: document.getElementById('home-sofa').value,
-          dining_table: document.getElementById('home-dining').value,
+          room_type: primaryRoom.type,
+          room_count: totalRooms,
+          lights_count: primaryRoom.lights + additionalRooms.reduce((acc, r) => acc + r.lights, 0),
+          fans_count: primaryRoom.fans + additionalRooms.reduce((acc, r) => acc + r.fans, 0),
+          sofa_requirement: primaryRoom.sofa,
+          dining_table: primaryRoom.dining,
           style_preference: document.getElementById('home-style').value,
+          additional_rooms: additionalRooms,
+          extra_requirements: extraRequirements,
           additional_notes: document.getElementById('home-notes').value
         };
 
@@ -252,7 +366,7 @@ const App = {
       });
     }
 
-    // 2. Party & Event Planner Form
+    // 2. Party & Event Planner Form (Section 9.1 - 9.5)
     const partyForm = document.getElementById('form-party-planner');
     if (partyForm) {
       partyForm.addEventListener('submit', async (e) => {
@@ -277,7 +391,7 @@ const App = {
       });
     }
 
-    // 3. Jewelry Planner Form & Image Upload
+    // 3. Jewelry Planner Form & Image Upload (Section 10.1 - 10.5)
     const jewelryForm = document.getElementById('form-jewelry-planner');
     const imageInput = document.getElementById('jewelry-outfit-image');
     const imagePreviewContainer = document.getElementById('jewelry-image-preview');
@@ -290,6 +404,10 @@ const App = {
         if (file) {
           if (!file.type.startsWith('image/')) {
             this.showToast('Please upload a valid image file (JPEG, PNG, WebP).', 'error');
+            return;
+          }
+          if (file.size > 8 * 1024 * 1024) {
+            this.showToast('Image size exceeds 8MB. Please select a smaller photo.', 'error');
             return;
           }
           selectedImageFile = file;
@@ -354,11 +472,12 @@ const App = {
 
     if (loadingOverlay) loadingOverlay.classList.add('loading-active');
 
+    // Step-by-step progress per spec Section 15.2
     const steps = [
-      "Analyzing budget and constraints...",
+      "Analyzing budget constraints and preferences...",
       "Calibrating mathematical category allocations...",
       "Matching verified products on Amazon, Flipkart, IKEA & Swiggy...",
-      "Optimizing savings and final calculations..."
+      "Optimizing savings and preparing your plan..."
     ];
 
     let stepIdx = 0;
@@ -384,7 +503,7 @@ const App = {
         if (loadingOverlay) loadingOverlay.classList.remove('loading-active');
         this.renderResults(plan);
         this.navigateTo('results');
-        this.showToast('Smart budget plan generated successfully!', 'success');
+        this.showToast('Smart budget plan generated & saved to Firestore!', 'success');
       }, 400);
 
     } catch (err) {
@@ -426,7 +545,7 @@ const App = {
       `;
     });
 
-    // Build Recommendations HTML
+    // Build Recommendations HTML with Section 9.4/12.3 platform distinction
     let recsHtml = '';
     plan.recommendations.forEach(rec => {
       const platformLogo = this.getPlatformLogo(rec.platform);
@@ -445,8 +564,8 @@ const App = {
               <span class="price-label">Estimated Price</span>
               <span class="price-val">₹${rec.estimated_price.toLocaleString('en-IN')}</span>
             </div>
-            <a href="${rec.search_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
-              View on ${rec.platform} &rarr;
+            <a href="${rec.search_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary" title="Search for this item on ${rec.platform}">
+              Search on ${rec.platform} ↗
             </a>
           </div>
         </div>
@@ -475,7 +594,7 @@ const App = {
       <div class="results-header-card">
         <div class="results-header-meta">
           <div class="meta-left">
-            <span class="badge ${badgeClass}">✓ Mathematically Verified</span>
+            <span class="badge ${badgeClass}">✓ Mathematically Verified (${isUnderBudget ? 'Within Budget' : 'Exceeds Budget'})</span>
             <h2>${plan.title}</h2>
             <p class="results-summary">${plan.summary}</p>
           </div>
@@ -514,7 +633,7 @@ const App = {
       <div class="recommendations-section">
         <div class="section-title-row">
           <h3>Curated Recommendations (${plan.recommendations.length} items)</h3>
-          <span class="subtitle">Direct platform links calibrated to your spend limit</span>
+          <span class="subtitle">Platform search links calibrated to your spend limit</span>
         </div>
         <div class="rec-grid">
           ${recsHtml}
@@ -533,23 +652,30 @@ const App = {
           <h4>📋 Actionable Next Steps</h4>
           <ul class="tips-list">
             <li><span class="tip-icon">✓</span> Compare seasonal combo coupons on verified partner websites.</li>
-            <li><span class="tip-icon">✓</span> Save this plan to your dashboard for one-click reference.</li>
+            <li><span class="tip-icon">✓</span> This plan is safely persisted to your Cloud Firestore dashboard.</li>
             <li><span class="tip-icon">✓</span> Lock in delivery dates 1-2 weeks ahead of your deadline.</li>
           </ul>
         </div>
       </div>
 
-      <!-- Results Action Bar -->
+      <!-- Results Action Bar with Reuse Plan per Section 14.4 -->
       <div class="results-action-bar">
+        <button type="button" class="btn btn-primary" onclick="App.reusePlan('${plan.id}')">
+          🔄 Edit & Reuse This Plan
+        </button>
         <button type="button" class="btn btn-secondary" onclick="window.print()">
           🖨️ Print / Save PDF
         </button>
-        <button type="button" class="btn btn-primary" onclick="App.navigateTo('${plan.planner_type}')">
+        <button type="button" class="btn btn-secondary" onclick="App.navigateTo('${plan.planner_type}')">
           ✨ Plan Another Goal
         </button>
         <button type="button" class="btn btn-secondary" onclick="App.navigateTo('dashboard')">
           📂 Go to Dashboard
         </button>
+      </div>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.8rem; color: var(--gray-400);">
+        ℹ️ Note: Store buttons direct you to live search queries on Amazon, Flipkart, IKEA, Swiggy, Zomato, and OYO.
       </div>
     `;
   },
@@ -566,23 +692,78 @@ const App = {
     return '🛒';
   },
 
-  // ==================== Render Dashboard & History ====================
+  // ==================== Reuse Plan (Section 14.4) ====================
+  async reusePlan(planId) {
+    let plan = this.currentPlan;
+    if (!plan || plan.id !== planId) {
+      const plans = await FirestoreService.getUserPlans();
+      plan = plans.find(p => p.id === planId);
+    }
+
+    if (!plan) {
+      this.showToast('Plan not found for reuse.', 'error');
+      return;
+    }
+
+    const inputData = plan.input_data || {};
+
+    if (plan.planner_type === 'home') {
+      if (document.getElementById('home-budget')) document.getElementById('home-budget').value = plan.budget;
+      if (document.getElementById('home-room-type') && inputData.room_type) document.getElementById('home-room-type').value = inputData.room_type;
+      if (document.getElementById('home-style') && inputData.style_preference) document.getElementById('home-style').value = inputData.style_preference;
+      if (document.getElementById('home-sofa') && inputData.sofa_requirement) document.getElementById('home-sofa').value = inputData.sofa_requirement;
+      if (document.getElementById('home-dining') && inputData.dining_table) document.getElementById('home-dining').value = inputData.dining_table;
+      if (document.getElementById('home-lights') && inputData.lights_count) document.getElementById('home-lights').value = inputData.lights_count;
+      if (document.getElementById('home-fans') && inputData.fans_count) document.getElementById('home-fans').value = inputData.fans_count;
+      if (document.getElementById('home-notes') && inputData.additional_notes) document.getElementById('home-notes').value = inputData.additional_notes;
+      this.navigateTo('home');
+      this.showToast('Home plan loaded! Edit budget or requirements and generate again.', 'success');
+
+    } else if (plan.planner_type === 'party') {
+      if (document.getElementById('party-budget')) document.getElementById('party-budget').value = plan.budget;
+      if (document.getElementById('party-event-type') && inputData.event_type) document.getElementById('party-event-type').value = inputData.event_type;
+      if (document.getElementById('party-guests') && inputData.guest_count) document.getElementById('party-guests').value = inputData.guest_count;
+      if (document.getElementById('party-venue') && inputData.venue_type) document.getElementById('party-venue').value = inputData.venue_type;
+      if (document.getElementById('party-food') && inputData.food_preference) document.getElementById('party-food').value = inputData.food_preference;
+      if (document.getElementById('party-theme') && inputData.theme) document.getElementById('party-theme').value = inputData.theme;
+      if (document.getElementById('party-entertainment') && inputData.entertainment) document.getElementById('party-entertainment').value = inputData.entertainment;
+      this.navigateTo('party');
+      this.showToast('Event plan loaded! Adjust details and generate again.', 'success');
+
+    } else if (plan.planner_type === 'jewelry') {
+      if (document.getElementById('jewelry-budget')) document.getElementById('jewelry-budget').value = plan.budget;
+      if (document.getElementById('jewelry-occasion') && inputData.occasion) document.getElementById('jewelry-occasion').value = inputData.occasion;
+      if (document.getElementById('jewelry-style') && inputData.style) document.getElementById('jewelry-style').value = inputData.style;
+      if (document.getElementById('jewelry-outfit-desc') && inputData.outfit_description) document.getElementById('jewelry-outfit-desc').value = inputData.outfit_description;
+      if (document.getElementById('jewelry-types') && inputData.jewelry_types) document.getElementById('jewelry-types').value = inputData.jewelry_types;
+      this.navigateTo('jewelry');
+      this.showToast('Jewelry ensemble loaded! Adjust specs and generate again.', 'success');
+    }
+  },
+
+  // ==================== Render Dashboard & History (Section 13.3 & 14.2) ====================
   async renderHistory() {
     const historyList = document.getElementById('history-list');
     const dashboardStats = document.getElementById('dashboard-stats-row');
     const recentList = document.getElementById('dashboard-recent-list');
 
-    const plans = await FirestoreService.getUserPlans();
+    const allPlans = await FirestoreService.getUserPlans();
+
+    // Filter plans for history view
+    let filteredPlans = allPlans;
+    if (this.historyFilter !== 'all') {
+      filteredPlans = allPlans.filter(p => p.planner_type === this.historyFilter);
+    }
 
     // Calculate Dashboard Stats
     if (dashboardStats) {
-      const totalBudgetManaged = plans.reduce((acc, p) => acc + (p.budget || 0), 0);
-      const totalSaved = plans.reduce((acc, p) => acc + (p.remaining_budget || 0), 0);
+      const totalBudgetManaged = allPlans.reduce((acc, p) => acc + (p.budget || 0), 0);
+      const totalSaved = allPlans.reduce((acc, p) => acc + (p.remaining_budget || 0), 0);
 
       dashboardStats.innerHTML = `
         <div class="stat-card">
           <span class="stat-label">Total Plans Created</span>
-          <span class="stat-value">${plans.length}</span>
+          <span class="stat-value">${allPlans.length}</span>
         </div>
         <div class="stat-card">
           <span class="stat-label">Total Budget Optimized</span>
@@ -595,28 +776,32 @@ const App = {
       `;
     }
 
-    // Render Recent in Dashboard
+    // Render Recent in Dashboard (up to 3 items)
     if (recentList) {
-      if (plans.length === 0) {
+      if (allPlans.length === 0) {
         recentList.innerHTML = `
           <div class="empty-state">
-            <p>No saved recommendations yet. Start by creating a plan below!</p>
-            <button class="btn btn-sm btn-primary" onclick="App.navigateTo('home')">Create Home Plan</button>
+            <span class="empty-icon">🛋️</span>
+            <p>No saved recommendations yet. Start planning below!</p>
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
+              <button class="btn btn-sm btn-primary" onclick="App.navigateTo('home')">Home Planner</button>
+              <button class="btn btn-sm btn-secondary" onclick="App.navigateTo('party')">Party Planner</button>
+            </div>
           </div>
         `;
       } else {
-        recentList.innerHTML = plans.slice(0, 3).map(p => this.renderPlanCard(p)).join('');
+        recentList.innerHTML = allPlans.slice(0, 3).map(p => this.renderPlanCard(p)).join('');
       }
     }
 
     // Render Full History
     if (historyList) {
-      if (plans.length === 0) {
+      if (filteredPlans.length === 0) {
         historyList.innerHTML = `
           <div class="empty-state">
             <span class="empty-icon">📂</span>
-            <h3>No Saved Plans Yet</h3>
-            <p>Every time you generate a budget recommendation, it's securely stored in Cloud Firestore.</p>
+            <h3>No Saved Plans Found</h3>
+            <p>${this.historyFilter === 'all' ? 'Every recommendation you create is securely synced with Cloud Firestore.' : `No plans found for category: ${this.historyFilter}.`}</p>
             <div style="margin-top: 1rem; display: flex; gap: 0.75rem; justify-content: center;">
               <button class="btn btn-primary" onclick="App.navigateTo('home')">Home Planner</button>
               <button class="btn btn-secondary" onclick="App.navigateTo('party')">Party Planner</button>
@@ -625,9 +810,17 @@ const App = {
           </div>
         `;
       } else {
-        historyList.innerHTML = plans.map(p => this.renderPlanCard(p)).join('');
+        historyList.innerHTML = filteredPlans.map(p => this.renderPlanCard(p)).join('');
       }
     }
+  },
+
+  setHistoryFilter(filterType) {
+    this.historyFilter = filterType;
+    document.querySelectorAll('[data-history-filter]').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-history-filter') === filterType);
+    });
+    this.renderHistory();
   },
 
   renderPlanCard(p) {
@@ -656,7 +849,7 @@ const App = {
             <span class="val">₹${(p.budget || 0).toLocaleString('en-IN')}</span>
           </div>
           <div>
-            <span class="label">Estimated Spend</span>
+            <span class="label">Spend</span>
             <span class="val text-primary">₹${(p.total_estimated_cost || 0).toLocaleString('en-IN')}</span>
           </div>
           <div>
@@ -667,6 +860,9 @@ const App = {
         <div class="plan-card-actions">
           <button class="btn btn-sm btn-outline-primary" onclick="App.viewHistoricalPlan('${p.id}')">
             View Details &rarr;
+          </button>
+          <button class="btn btn-sm btn-secondary" onclick="App.reusePlan('${p.id}')" title="Pre-fill form and generate again">
+            🔄 Reuse
           </button>
           <button class="btn btn-sm btn-danger-outline" onclick="App.deleteHistoricalPlan('${p.id}')">
             Delete
@@ -687,7 +883,7 @@ const App = {
   },
 
   async deleteHistoricalPlan(planId) {
-    if (confirm('Are you sure you want to delete this saved plan?')) {
+    if (confirm('Are you sure you want to delete this saved plan from Cloud Firestore?')) {
       await FirestoreService.deletePlan(planId);
       this.showToast('Plan deleted from Cloud Firestore.', 'info');
       this.renderHistory();

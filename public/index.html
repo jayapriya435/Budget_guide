@@ -362,6 +362,31 @@
               </div>
             </div>
 
+            <!-- Extra Furniture & Decor Checkboxes (Section 8.1) -->
+            <div class="form-group">
+              <label>Additional Furniture & Decor Essentials</label>
+              <div class="checkbox-pill-grid">
+                <label class="checkbox-pill-label">
+                  <input type="checkbox" id="home-req-tv" checked> TV Unit
+                </label>
+                <label class="checkbox-pill-label">
+                  <input type="checkbox" id="home-req-curtains" checked> Curtains & Drapes
+                </label>
+                <label class="checkbox-pill-label">
+                  <input type="checkbox" id="home-req-rug"> Floor Rug / Carpet
+                </label>
+                <label class="checkbox-pill-label">
+                  <input type="checkbox" id="home-req-plants"> Indoor Plants
+                </label>
+              </div>
+            </div>
+
+            <!-- Dynamic Additional Rooms Container (Section 8.2) -->
+            <div id="additional-rooms-container"></div>
+            <button type="button" class="btn-add-room" id="btn-add-extra-room">
+              + Add Another Room (Bedroom, Kitchen, Study...)
+            </button>
+
             <div class="form-group">
               <label for="home-notes">Special Requirements / Notes (Optional)</label>
               <textarea id="home-notes" class="form-control" rows="2" placeholder="e.g. Need pet-friendly fabric, space for 55-inch TV wall mount..."></textarea>
@@ -591,7 +616,7 @@
       <div class="page-header" style="padding: 3rem 0 2rem;">
         <div class="container">
           <span class="header-badge">📊 Cloud Control Center</span>
-          <h1>Planner Dashboard</h1>
+          <h1 id="dashboard-welcome-heading">Welcome, Smart Planner! 👋</h1>
           <p>All your saved recommendations synced with Cloud Firestore.</p>
         </div>
       </div>
@@ -645,6 +670,14 @@
       </div>
 
       <div class="history-container">
+        <!-- Category Filter Chips (Section 14.2) -->
+        <div class="filter-chips-row">
+          <button type="button" class="filter-chip active" data-history-filter="all" onclick="App.setHistoryFilter('all')">All Plans</button>
+          <button type="button" class="filter-chip" data-history-filter="home" onclick="App.setHistoryFilter('home')">🛋️ Home Interior</button>
+          <button type="button" class="filter-chip" data-history-filter="party" onclick="App.setHistoryFilter('party')">🎉 Party & Event</button>
+          <button type="button" class="filter-chip" data-history-filter="jewelry" onclick="App.setHistoryFilter('jewelry')">💎 Jewelry Ensemble</button>
+        </div>
+
         <div class="plan-history-grid" id="history-list">
           <!-- History cards injected dynamically -->
         </div>

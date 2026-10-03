@@ -931,3 +931,170 @@
     padding: 1.5rem;
   }
 }
+
+/* Dynamic Room Builder Styles (Section 8.2) */
+.extra-room-card {
+  background: var(--gray-50);
+  border: 1.5px dashed var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  animation: fadeInView 0.25s ease-out;
+}
+
+.extra-room-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.extra-room-header h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.btn-remove-room {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #fee2e2;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-remove-room:hover {
+  background: #fef2f2;
+}
+
+.btn-add-room {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  background: white;
+  border: 1.5px dashed var(--primary);
+  color: var(--primary);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1.5rem;
+}
+
+.btn-add-room:hover {
+  background: var(--primary-light);
+}
+
+/* Checkbox Pill Grid */
+.checkbox-pill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.checkbox-pill-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  padding: 0.6rem 0.85rem !important;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  margin-bottom: 0 !important;
+  transition: all 0.2s ease;
+}
+
+.checkbox-pill-label:hover {
+  border-color: var(--primary);
+  background: #f8fafc;
+}
+
+.checkbox-pill-label input[type="checkbox"] {
+  accent-color: var(--primary);
+}
+
+/* History Filter Chips */
+.filter-chips-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.filter-chip {
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-full);
+  background: white;
+  border: 1px solid var(--gray-200);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-chip.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+}
+
+/* ==========================================================================
+   Print / PDF Styles (Section 13.5 & Export Plan)
+   ========================================================================== */
+@media print {
+  header.navbar,
+  footer,
+  .results-action-bar,
+  .toast-container,
+  .modal-overlay,
+  .loading-overlay,
+  .btn,
+  .filter-chips-row {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: #111827 !important;
+  }
+
+  .app-view {
+    display: none !important;
+  }
+
+  #view-results.app-view.active {
+    display: block !important;
+  }
+
+  .results-content {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .results-header-card,
+  .allocation-card,
+  .recommendations-section,
+  .tips-card,
+  .rec-card {
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb !important;
+    break-inside: avoid;
+  }
+
+  .rec-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+

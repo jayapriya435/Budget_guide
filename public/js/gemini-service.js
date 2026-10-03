@@ -49,14 +49,24 @@ const GeminiService = {
 
   // ==================== Prompt Builders ====================
   buildHomePrompt(data) {
+    const extraRoomsStr = (data.additional_rooms && data.additional_rooms.length > 0)
+      ? data.additional_rooms.map((r, i) => `Additional Room ${i + 1} (${r.type}): ${r.furniture}, ${r.lights} Lights, ${r.fans} Fans`).join('; ')
+      : 'None';
+    const extraReqsStr = (data.extra_requirements && data.extra_requirements.length > 0)
+      ? data.extra_requirements.join(', ')
+      : 'Standard essentials';
+
     return `You are PocketSmart AI, an expert budget-conscious interior designer for Indian homes.
 Create a detailed, mathematically verified interior budget allocation and itemized shopping list.
 
 Client Requirements:
 - Total Budget: ₹${data.budget}
-- Room Type: ${data.room_type} (${data.room_count} room)
+- Primary Room: ${data.room_type}
+- Total Rooms: ${data.room_count || 1}
+- Additional Rooms: ${extraRoomsStr}
 - Fixtures: ${data.lights_count} Lights, ${data.fans_count} Ceiling Fans
-- Furniture: Sofa: ${data.sofa_requirement}, Dining Table: ${data.dining_table}
+- Core Furniture: Sofa: ${data.sofa_requirement}, Dining Table: ${data.dining_table}
+- Extra Decor/Furniture Desired: ${extraReqsStr}
 - Style Preference: ${data.style_preference}
 - Additional Notes: ${data.additional_notes || 'None'}
 
