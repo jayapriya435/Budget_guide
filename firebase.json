@@ -6,18 +6,9 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
-      {
-        "source": "**",
-        "run": {
-          "serviceId": "pocketsmart-ai",
-          "region": "asia-south1"
-        }
-      }
-    ],
     "headers": [
       {
-        "source": "/static/**",
+        "source": "**/*.@(css|js|png|jpg|jpeg|gif|svg|webp)",
         "headers": [
           {
             "key": "Cache-Control",

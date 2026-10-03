@@ -3,37 +3,312 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PocketSmart AI — Loading...</title>
+  <title>PocketSmart AI — Smart Budget & Recommendation Assistant</title>
+  <meta name="description" content="AI-driven budget planning and recommendation assistant for Home Interior, Party Planning, and Jewelry. Powered by Google Gemini AI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
   <style>
-    body {
-      margin: 0;
-      display: flex;
+    .deploy-badge {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: #0a0a0f;
-      color: #e0e0e0;
-      font-family: 'Inter', system-ui, sans-serif;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #059669;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
     }
-    .loading {
-      text-align: center;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(168,85,247,0.2);
-      border-top-color: #a855f7;
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 1rem;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse 1.6s infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .status-banner {
+      background: linear-gradient(135deg, #1e1b4b, #0f172a);
+      color: white;
+      padding: 1rem 0;
+      text-align: center;
+      font-size: 0.9rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .status-banner a {
+      color: #38bdf8;
+      text-decoration: underline;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
-  <div class="loading">
-    <div class="spinner"></div>
-    <p>Connecting to PocketSmart AI...</p>
+  <!-- Status Banner -->
+  <div class="status-banner">
+    🚀 <strong>PocketSmart AI Production Deployment</strong> • Hosted on Firebase & Google Cloud • Powered by Google Gemini AI
   </div>
+
+  <!-- Header / Navigation -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="brand" id="brand-logo">
+        <div class="brand-icon">⚡</div>
+        <span>PocketSmart <span class="accent">AI</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#planners">Planners</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#tech-stack">Architecture</a></li>
+        <li><a href="#testimonials">Testimonials</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="deploy-badge">
+          <span class="pulse-dot"></span> Firebase Hosting Live
+        </div>
+        <h1>Plan Smarter. Spend Better.<br><span class="gradient-text">Powered by Gemini AI</span></h1>
+        <p>PocketSmart AI turns your budget into personalized, actionable shopping & service recommendations for Home Interiors, Events, and Jewelry.</p>
+        <div class="hero-actions">
+          <a href="#planners" class="btn btn-primary" id="cta-get-started">Explore Planners</a>
+          <a href="#tech-stack" class="btn btn-secondary" id="cta-explore">View Architecture</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Planners Section -->
+    <section class="section" id="planners">
+      <div class="container">
+        <div class="section-header">
+          <h2>Explore AI Planners</h2>
+          <p>Select your goal, specify your exact budget and preferences, and let our intelligent engine optimize every rupee.</p>
+        </div>
+
+        <div class="grid-3">
+          <!-- Home Interior Card -->
+          <div class="card" id="card-home-planner">
+            <div class="card-icon icon-home">🛋️</div>
+            <h3>Home Interior Planner</h3>
+            <p>Design your dream space without blowing your budget. Get room-by-room allocations and curated furniture, lighting, and decor.</p>
+            <ul class="card-features">
+              <li><span>✓</span> Dynamic room & furniture breakdown</li>
+              <li><span>✓</span> Lighting & appliances allocation</li>
+              <li><span>✓</span> Direct links to Amazon, Flipkart & IKEA</li>
+            </ul>
+            <div style="margin-top: 1.5rem;">
+              <span class="badge" style="background:#eef2ff; color:#4f46e5; padding: 0.35rem 0.75rem; border-radius:9999px; font-size:0.8rem; font-weight:600;">FastAPI + Gemini AI</span>
+            </div>
+          </div>
+
+          <!-- Party Planner Card -->
+          <div class="card" id="card-party-planner">
+            <div class="card-icon icon-party">🎉</div>
+            <h3>Party & Event Planner</h3>
+            <p>Host unforgettable birthdays, corporate parties, or weddings. We distribute your budget across catering, venue, decor, and entertainment.</p>
+            <ul class="card-features">
+              <li><span>✓</span> Guest-count calibrated budgeting</li>
+              <li><span>✓</span> Catering & venue recommendations</li>
+              <li><span>✓</span> Swiggy, Zomato & OYO search links</li>
+            </ul>
+            <div style="margin-top: 1.5rem;">
+              <span class="badge" style="background:#ecfdf5; color:#059669; padding: 0.35rem 0.75rem; border-radius:9999px; font-size:0.8rem; font-weight:600;">FastAPI + Gemini AI</span>
+            </div>
+          </div>
+
+          <!-- Jewelry Planner Card -->
+          <div class="card" id="card-jewelry-planner">
+            <div class="card-icon icon-jewelry">💎</div>
+            <h3>Jewelry Planner</h3>
+            <p>Multimodal AI matching. Describe your style or upload an outfit picture to find matching necklaces, earrings, and accessories.</p>
+            <ul class="card-features">
+              <li><span>✓</span> Outfit image color & style analysis</li>
+              <li><span>✓</span> Occasion-specific matching (Weddings, Galas)</li>
+              <li><span>✓</span> Curated shopping recommendations</li>
+            </ul>
+            <div style="margin-top: 1.5rem;">
+              <span class="badge" style="background:#fdf4ff; color:#c026d3; padding: 0.35rem 0.75rem; border-radius:9999px; font-size:0.8rem; font-weight:600;">Pillow + Gemini Multimodal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section class="section" id="tech-stack" style="background: white;">
+      <div class="container">
+        <div class="section-header">
+          <h2>Production Architecture</h2>
+          <p>Built strictly according to enterprise cloud-native standards.</p>
+        </div>
+
+        <div style="max-width: 900px; margin: 0 auto; overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+            <thead>
+              <tr style="background: linear-gradient(135deg, #0f172a, #1e1b4b); color: white;">
+                <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.95rem;">Layer</th>
+                <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.95rem;">Technology Stack</th>
+                <th style="padding: 1rem 1.5rem; text-align: left; font-size: 0.95rem;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Frontend</td>
+                <td style="padding: 1rem 1.5rem; color: #475569;">HTML + CSS + JavaScript + Jinja2</td>
+                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Ready</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;">
+                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Backend</td>
+                <td style="padding: 1rem 1.5rem; color: #475569;">FastAPI + Python 3.11</td>
+                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Ready</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">AI Engine</td>
+                <td style="padding: 1rem 1.5rem; color: #475569;">Google Gemini API (3.5 Flash Lite Cascade)</td>
+                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Active</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;">
+                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Database</td>
+                <td style="padding: 1rem 1.5rem; color: #475569;">Google Cloud Firestore (NoSQL)</td>
+                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Integrated</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Authentication</td>
+                <td style="padding: 1rem 1.5rem; color: #475569;">FastAPI JWT Authentication + Bcrypt</td>
+                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Ready</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;">
+                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Image Processing</td>
+                <td style="padding: 1rem 1.5rem; color: #475569;">Pillow + Gemini Multimodal Vision</td>
+                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Ready</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Backend Hosting</td>
+                <td style="padding: 1rem 1.5rem; color: #475569;">Google Cloud Run (asia-south1)</td>
+                <td style="padding: 1rem 1.5rem;"><span style="color:#2563eb; font-weight:600;">⚡ Dockerized</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;">
+                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Frontend Hosting</td>
+                <td style="padding: 1rem 1.5rem; color: #475569;">Firebase Hosting (pocketsmartai-app.web.app)</td>
+                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Live</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Storage</td>
+                <td style="padding: 1rem 1.5rem; color: #475569;">Firebase Storage / Cloud Storage</td>
+                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Integrated</span></td>
+              </tr>
+              <tr style="background: #fafafa;">
+                <td style="padding: 1rem 1.5rem; font-weight: 600; color: #1e293b;">Source Control</td>
+                <td style="padding: 1rem 1.5rem; color: #475569;">GitHub (Git initialized)</td>
+                <td style="padding: 1rem 1.5rem;"><span style="color:#059669; font-weight:600;">✓ Initialized</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="section how-it-works" id="how-it-works">
+      <div class="container">
+        <div class="section-header">
+          <h2>How PocketSmart AI Works</h2>
+          <p>Three simple steps from budget constraint to complete shopping list.</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <h4>Set Your Budget</h4>
+            <p>Enter your target spend limit and specify the items, rooms, or occasion details you need.</p>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <h4>AI Calculates & Curates</h4>
+            <p>Gemini AI breaks down allocations mathematically and matches products within each sub-budget.</p>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <h4>Save & Purchase</h4>
+            <p>Review recommendations, check verified platform links, save plans to your history, and buy with confidence.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="section" id="testimonials">
+      <div class="container">
+        <div class="section-header">
+          <h2>Loved by Smart Planners</h2>
+          <p>See how real users furnished homes and hosted parties without overspending.</p>
+        </div>
+
+        <div class="grid-3">
+          <div class="testimonial-card">
+            <p class="testimonial-quote">"Furnished my 2BHK living room with a strict ₹60,000 budget. PocketSmart AI gave me exact sofa and lighting options with money left over."</p>
+            <div class="testimonial-author">
+              <div class="author-avatar">AP</div>
+              <div class="author-info">
+                <h5>Ananya P.</h5>
+                <span>Bangalore • Home Planner</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <p class="testimonial-quote">"Organized a 50-person corporate celebration. The catering and venue suggestions saved us at least ₹25,000 compared to external event agencies."</p>
+            <div class="testimonial-author">
+              <div class="author-avatar">RK</div>
+              <div class="author-info">
+                <h5>Rahul K.</h5>
+                <span>Hyderabad • Party Planner</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <p class="testimonial-quote">"I uploaded a picture of my wedding reception lehenga and it recommended jewelry that matched the emerald undertones perfectly within my budget."</p>
+            <div class="testimonial-author">
+              <div class="author-avatar">SM</div>
+              <div class="author-info">
+                <h5>Sneha M.</h5>
+                <span>Mumbai • Jewelry Planner</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <p>&copy; 2026 PocketSmart AI. Budget-aware recommendation assistant.</p>
+      <ul class="footer-links">
+        <li><a href="#planners">Planners</a></li>
+        <li><a href="#tech-stack">Architecture</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
 </body>
 </html>

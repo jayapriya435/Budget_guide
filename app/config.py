@@ -20,8 +20,11 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-3.5-flash-lite"
 
-    # Database
+    # Database & Storage
     DATABASE_URL: str = "sqlite:///./pocketsmart.db"
+    GCP_PROJECT: str = "pocketsmartai-app"
+    USE_FIRESTORE: bool = False
+    STORAGE_BUCKET: str = "pocketsmartai-app.appspot.com"
 
     # CORS
     CORS_ORIGINS: str = "*"

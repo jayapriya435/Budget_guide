@@ -85,27 +85,24 @@ async def generate_jewelry_recommendations(
             )
 
         # Generate unique safe filename
-        ext = Path(outfit_image.filename).suffix or ".jpg"
-        unique_name = f"{uuid.uuid4().hex}{ext}"
-        destination = UPLOADS_DIR / unique_name
-
+        from app.services.storage_service import storage_service
         try:
-            with open(destination, "wb") as f:
-                f.write(contents)
+            # Validate with PIL first
+            import io
+            with Image.open(io.BytesIO(contents)) as test_img:
+                test_img.verify()
 
-            # Validate that PIL can open the image
-            with Image.open(destination) as img:
-                img.verify()
-
-            saved_image_path = str(destination)
-            saved_image_url = f"/static/uploads/{unique_name}"
-        except Exception:
-            if destination.exists():
-                os.remove(destination)
+            # Save via unified storage service (Cloud Storage in prod, local disk in dev)
+            saved_image_url, saved_image_path = storage_service.save_image(
+                file_bytes=contents,
+                filename=outfit_image.filename,
+                content_type=outfit_image.content_type or "image/jpeg"
+            )
+        except Exception as img_err:
             return templates.TemplateResponse(
                 request=request,
                 name="jewelry_planner.html",
-                context={"user": current_user, "error": "Uploaded image file is corrupted or invalid."}
+                context={"user": current_user, "error": f"Invalid image file: {str(img_err)}"}
             )
 
     input_payload = {
