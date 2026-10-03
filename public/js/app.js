@@ -49,15 +49,20 @@ const App = {
 
     const validViews = ['auth', 'landing', 'home', 'party', 'jewelry', 'results', 'dashboard', 'history'];
     if (!validViews.includes(viewId)) {
-      viewId = AuthService.currentUser ? 'dashboard' : 'auth';
+      viewId = AuthService.isAuthenticated() ? 'dashboard' : 'auth';
     }
 
     // Auth gate for application views
-    const protectedViews = ['dashboard', 'history', 'home', 'party', 'jewelry'];
-    if (protectedViews.includes(viewId) && !AuthService.currentUser) {
+    const protectedViews = ['dashboard', 'history', 'home', 'party', 'jewelry', 'results'];
+    if (protectedViews.includes(viewId) && !AuthService.isAuthenticated()) {
       this.intendedRoute = viewId;
-      this.showToast('Please sign in or continue as Guest to access this planner.', 'info');
+      this.showToast('Please sign in or create an account to access this feature.', 'info');
       this.navigateTo('auth', pushState);
+      return;
+    }
+
+    if (viewId === 'results' && !this.currentPlan) {
+      this.navigateTo(AuthService.isAuthenticated() ? 'dashboard' : 'auth', pushState);
       return;
     }
 
@@ -92,9 +97,9 @@ const App = {
 
   handleInitialRoute() {
     const rawHash = (window.location.hash.replace('#', '') || '').trim();
-    const user = AuthService.currentUser;
+    const isAuthed = AuthService.isAuthenticated();
 
-    if (!user) {
+    if (!isAuthed) {
       // First screen for unauthenticated visitors is the Sign In / Sign Up screen!
       if (rawHash === 'landing' || rawHash === 'overview') {
         this.navigateTo('landing', false);
@@ -116,7 +121,7 @@ const App = {
     }
 
     window.addEventListener('popstate', () => {
-      const h = window.location.hash.replace('#', '') || (AuthService.currentUser ? 'dashboard' : 'auth');
+      const h = window.location.hash.replace('#', '') || (AuthService.isAuthenticated() ? 'dashboard' : 'auth');
       this.navigateTo(h, false);
     });
   },
@@ -269,26 +274,6 @@ const App = {
       });
     });
 
-    // Guest / Demo Mode Quick Access
-    const guestBtns = document.querySelectorAll('.guest-signin-btn');
-    guestBtns.forEach(btn => {
-      btn.addEventListener('click', async () => {
-        try {
-          btn.disabled = true;
-          await AuthService.loginAsGuest();
-          if (authModal) authModal.classList.remove('modal-open');
-          this.showToast('Logged in as Guest! Full access enabled.', 'success');
-          const destination = this.intendedRoute || 'dashboard';
-          this.intendedRoute = null;
-          this.navigateTo(destination);
-        } catch (err) {
-          this.showToast('Could not start guest session.', 'error');
-        } finally {
-          btn.disabled = false;
-        }
-      });
-    });
-
     // Logout -> redirects to Sign In screen
     const logoutBtns = document.querySelectorAll('.logout-btn');
     logoutBtns.forEach(btn => {
@@ -320,10 +305,12 @@ const App = {
     const userAvatar = document.getElementById('nav-user-avatar');
     const welcomeHeading = document.getElementById('dashboard-welcome-heading');
 
-    if (user) {
+    const isAuthed = AuthService.isAuthenticated();
+
+    if (isAuthed && user) {
       if (unauthNav) unauthNav.style.display = 'none';
       if (authNav) authNav.style.display = 'flex';
-      const displayName = user.displayName || user.email.split('@')[0];
+      const displayName = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
       if (userNameSpan) userNameSpan.textContent = displayName;
       if (userAvatar) {
         userAvatar.textContent = displayName.charAt(0).toUpperCase();
@@ -413,6 +400,14 @@ const App = {
       homeForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        // Enforce strict authentication gate
+        if (!AuthService.isAuthenticated()) {
+          this.intendedRoute = 'home';
+          this.showToast('Please sign in or create an account to generate your AI budget plan.', 'error');
+          this.navigateTo('auth');
+          return;
+        }
+
         // Collect primary room
         const primaryRoom = {
           type: document.getElementById('home-room-type').value,
@@ -470,6 +465,15 @@ const App = {
     if (partyForm) {
       partyForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // Enforce strict authentication gate
+        if (!AuthService.isAuthenticated()) {
+          this.intendedRoute = 'party';
+          this.showToast('Please sign in or create an account to generate your AI budget plan.', 'error');
+          this.navigateTo('auth');
+          return;
+        }
+
         const data = {
           budget: parseFloat(document.getElementById('party-budget').value),
           event_type: document.getElementById('party-event-type').value,
@@ -537,6 +541,15 @@ const App = {
     if (jewelryForm) {
       jewelryForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // Enforce strict authentication gate
+        if (!AuthService.isAuthenticated()) {
+          this.intendedRoute = 'jewelry';
+          this.showToast('Please sign in or create an account to generate your AI budget plan.', 'error');
+          this.navigateTo('auth');
+          return;
+        }
+
         const data = {
           budget: parseFloat(document.getElementById('jewelry-budget').value),
           occasion: document.getElementById('jewelry-occasion').value,
@@ -555,7 +568,7 @@ const App = {
         let uploadedUrl = null;
         if (selectedImageFile) {
           const user = AuthService.currentUser;
-          uploadedUrl = await StorageService.uploadImage(selectedImageFile, user ? user.uid : 'guest');
+          uploadedUrl = await StorageService.uploadImage(selectedImageFile, user?.uid || 'user');
         }
 
         await this.executePlanGeneration('jewelry', data, loadedImageBase64, uploadedUrl);
@@ -565,41 +578,64 @@ const App = {
 
   // ==================== Plan Generation Execution ====================
   async executePlanGeneration(plannerType, formData, imageBase64 = null, imageUrl = null) {
+    // Strict authentication gate - generation is prohibited without signing in or signing up
+    if (!AuthService.isAuthenticated()) {
+      this.intendedRoute = plannerType;
+      this.showToast('Authentication required. Please sign in or create an account before generating a plan.', 'error');
+      this.navigateTo('auth');
+      return;
+    }
+
     const loadingOverlay = document.getElementById('ai-loading-overlay');
     const loadingStepText = document.getElementById('loading-step-text');
     const loadingBarFill = document.getElementById('loading-bar-fill');
 
-    if (loadingOverlay) loadingOverlay.classList.add('loading-active');
+    if (loadingOverlay) {
+      loadingOverlay.style.display = 'flex';
+      loadingOverlay.classList.add('loading-active', 'active');
+    }
 
     // Step-by-step progress per spec Section 15.2
     const steps = [
       "Analyzing budget constraints and preferences...",
       "Calibrating mathematical category allocations...",
       "Matching verified products on Amazon, Flipkart, IKEA & Swiggy...",
-      "Optimizing savings and preparing your plan..."
+      "Optimizing savings and preparing your smart plan..."
     ];
+
+    if (loadingStepText) loadingStepText.textContent = steps[0];
+    if (loadingBarFill) loadingBarFill.style.width = '25%';
 
     let stepIdx = 0;
     const interval = setInterval(() => {
       stepIdx = (stepIdx + 1) % steps.length;
       if (loadingStepText) loadingStepText.textContent = steps[stepIdx];
-      if (loadingBarFill) loadingBarFill.style.width = `${((stepIdx + 1) / steps.length) * 85}%`;
-    }, 700);
+      if (loadingBarFill) loadingBarFill.style.width = `${Math.min(92, Math.round(((stepIdx + 1) / steps.length) * 100))}%`;
+    }, 600);
 
     try {
-      const plan = await GeminiService.generatePlan(plannerType, formData, imageBase64);
-      if (imageUrl) plan.image_url = imageUrl;
+      // Ensure the loader remains visible for at least 2.2 seconds so progress steps and animation are seen
+      const minDisplayDelay = new Promise(resolve => setTimeout(resolve, 2200));
+      const [plan] = await Promise.all([
+        GeminiService.generatePlan(plannerType, formData, imageBase64),
+        minDisplayDelay
+      ]);
 
+      if (imageUrl) plan.image_url = imageUrl;
       this.currentPlan = plan;
 
       // Auto-save plan to Firestore/Local
       await FirestoreService.savePlan(plan);
 
       clearInterval(interval);
+      if (loadingStepText) loadingStepText.textContent = "Finalizing your smart plan recommendations...";
       if (loadingBarFill) loadingBarFill.style.width = '100%';
 
       setTimeout(() => {
-        if (loadingOverlay) loadingOverlay.classList.remove('loading-active');
+        if (loadingOverlay) {
+          loadingOverlay.classList.remove('loading-active', 'active');
+          loadingOverlay.style.display = 'none';
+        }
         this.renderResults(plan);
         this.navigateTo('results');
         this.showToast('Smart budget plan generated & saved to Firestore!', 'success');
@@ -607,7 +643,10 @@ const App = {
 
     } catch (err) {
       clearInterval(interval);
-      if (loadingOverlay) loadingOverlay.classList.remove('loading-active');
+      if (loadingOverlay) {
+        loadingOverlay.classList.remove('loading-active', 'active');
+        loadingOverlay.style.display = 'none';
+      }
       this.showToast('Plan generation encountered an error: ' + err.message, 'error');
     }
   },

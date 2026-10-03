@@ -42,39 +42,40 @@ const AuthService = {
   listeners: [],
 
   init() {
-    if (!isFirebaseInitialized) {
-      // Check localStorage for offline demo user
-      const stored = localStorage.getItem('ps_local_user');
-      if (stored) {
-        try {
-          this.currentUser = JSON.parse(stored);
-          this.notify();
-        } catch (e) {}
+    // Clear any legacy guest sessions from localStorage
+    const stored = localStorage.getItem('ps_local_user');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed.email && parsed.email !== 'guest@pocketsmart.ai' && !parsed.isGuest && !parsed.uid?.startsWith('guest_')) {
+          this.currentUser = parsed;
+        } else {
+          localStorage.removeItem('ps_local_user');
+          this.currentUser = null;
+        }
+      } catch (e) {
+        localStorage.removeItem('ps_local_user');
+        this.currentUser = null;
       }
+    }
+
+    if (!isFirebaseInitialized) {
+      this.notify();
       return;
     }
 
     auth.onAuthStateChanged((user) => {
-      if (user) {
+      if (user && !user.isAnonymous) {
         this.currentUser = {
           uid: user.uid,
           email: user.email,
-          displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Smart Planner'),
+          displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'User'),
           photoURL: user.photoURL || null
         };
         localStorage.setItem('ps_local_user', JSON.stringify(this.currentUser));
       } else {
-        // If not authenticated via Firebase, check if local guest mode is active
-        const stored = localStorage.getItem('ps_local_user');
-        if (stored) {
-          try {
-            this.currentUser = JSON.parse(stored);
-          } catch (e) {
-            this.currentUser = null;
-          }
-        } else {
-          this.currentUser = null;
-        }
+        this.currentUser = null;
+        localStorage.removeItem('ps_local_user');
       }
       this.notify();
     });
@@ -82,7 +83,7 @@ const AuthService = {
     // Check redirect result for mobile/popup-blocked browsers
     if (auth.getRedirectResult) {
       auth.getRedirectResult().then((result) => {
-        if (result && result.user) {
+        if (result && result.user && !result.user.isAnonymous) {
           console.log("⚡ PocketSmart AI: Signed in via redirect:", result.user.email);
           this.currentUser = {
             uid: result.user.uid,
@@ -99,6 +100,10 @@ const AuthService = {
     }
   },
 
+  isAuthenticated() {
+    return !!(this.currentUser && this.currentUser.uid && this.currentUser.email && this.currentUser.email !== 'guest@pocketsmart.ai' && !this.currentUser.isGuest);
+  },
+
   onStateChange(callback) {
     this.listeners.push(callback);
     if (this.currentUser !== undefined) {
@@ -112,7 +117,7 @@ const AuthService = {
 
   async login(email, password) {
     if (!isFirebaseInitialized) {
-      this.currentUser = { uid: 'offline_user_' + Date.now(), email, displayName: email.split('@')[0] };
+      this.currentUser = { uid: 'user_' + Date.now(), email, displayName: email.split('@')[0] };
       localStorage.setItem('ps_local_user', JSON.stringify(this.currentUser));
       this.notify();
       return this.currentUser;
@@ -123,7 +128,7 @@ const AuthService = {
 
   async register(email, password, displayName) {
     if (!isFirebaseInitialized) {
-      this.currentUser = { uid: 'offline_user_' + Date.now(), email, displayName: displayName || email.split('@')[0] };
+      this.currentUser = { uid: 'user_' + Date.now(), email, displayName: displayName || email.split('@')[0] };
       localStorage.setItem('ps_local_user', JSON.stringify(this.currentUser));
       this.notify();
       return this.currentUser;
@@ -137,10 +142,7 @@ const AuthService = {
 
   async loginWithGoogle() {
     if (!isFirebaseInitialized) {
-      this.currentUser = { uid: 'demo_google_user', email: 'guest@pocketsmart.ai', displayName: 'Smart Planner Guest' };
-      localStorage.setItem('ps_local_user', JSON.stringify(this.currentUser));
-      this.notify();
-      return this.currentUser;
+      throw new Error("Firebase SDK is not available.");
     }
 
     try {
@@ -154,35 +156,6 @@ const AuthService = {
       }
       throw err;
     }
-  },
-
-  async loginAsGuest() {
-    if (isFirebaseInitialized && auth) {
-      try {
-        const cred = await auth.signInAnonymously();
-        if (cred && cred.user) {
-          this.currentUser = {
-            uid: cred.user.uid,
-            email: 'guest@pocketsmart.ai',
-            displayName: 'Guest Planner'
-          };
-          localStorage.setItem('ps_local_user', JSON.stringify(this.currentUser));
-          this.notify();
-          return this.currentUser;
-        }
-      } catch (err) {
-        console.info("Anonymous auth not enabled in console, using offline local guest session.");
-      }
-    }
-
-    this.currentUser = {
-      uid: 'guest_' + Math.random().toString(36).substring(2, 9),
-      email: 'guest@pocketsmart.ai',
-      displayName: 'Guest Planner'
-    };
-    localStorage.setItem('ps_local_user', JSON.stringify(this.currentUser));
-    this.notify();
-    return this.currentUser;
   },
 
   async logout() {

@@ -480,9 +480,10 @@ footer {
   transition: opacity 0.3s ease;
 }
 
-.loading-overlay.active {
-  display: flex;
-  opacity: 1;
+.loading-overlay.active,
+.loading-overlay.loading-active {
+  display: flex !important;
+  opacity: 1 !important;
 }
 
 .loading-modal {
