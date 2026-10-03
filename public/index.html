@@ -77,8 +77,8 @@
 
         <!-- Unauthenticated state -->
         <li id="nav-unauthenticated" style="display: flex; gap: 0.75rem; align-items: center;">
-          <button type="button" class="btn btn-secondary open-auth-btn" data-auth-mode="signin">Sign In</button>
-          <button type="button" class="btn btn-primary open-auth-btn" data-auth-mode="signup">Get Started</button>
+          <a href="#login" data-navigate="login" class="btn btn-secondary">Sign In</a>
+          <a href="#register" data-navigate="register" class="btn btn-primary">Get Started</a>
         </li>
 
         <!-- Authenticated state -->
@@ -103,8 +103,80 @@
 
   <!-- Main Views Container -->
   <main>
+    <!-- ==================== VIEW 0: SIGN IN / SIGN UP (FIRST SCREEN) ==================== -->
+    <section id="view-auth" class="app-view active">
+      <div class="auth-page-container">
+        <div class="auth-card">
+          <div class="auth-card-branding">
+            <div class="brand-badge">⚡ PocketSmart AI</div>
+            <h1>Welcome! Sign in to start</h1>
+            <p>Access smart AI budget planners for Home, Parties & Jewelry</p>
+          </div>
+
+          <!-- Auth Tab Switcher -->
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab-btn active" data-auth-tab="signin">Sign In</button>
+            <button type="button" class="auth-tab-btn" data-auth-tab="signup">Create Account</button>
+          </div>
+
+          <!-- Sign In Tab Form -->
+          <div id="signin-tab-content">
+            <form id="signin-form">
+              <div class="form-group">
+                <label for="signin-email">Email Address</label>
+                <input type="email" id="signin-email" class="form-control" placeholder="name@example.com" required>
+              </div>
+              <div class="form-group">
+                <label for="signin-password">Password</label>
+                <input type="password" id="signin-password" class="form-control" placeholder="••••••••" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem;">Sign In</button>
+            </form>
+          </div>
+
+          <!-- Sign Up Tab Form -->
+          <div id="signup-tab-content" style="display: none;">
+            <form id="signup-form">
+              <div class="form-group">
+                <label for="signup-name">Full Name</label>
+                <input type="text" id="signup-name" class="form-control" placeholder="Your Name" required>
+              </div>
+              <div class="form-group">
+                <label for="signup-email">Email Address</label>
+                <input type="email" id="signup-email" class="form-control" placeholder="name@example.com" required>
+              </div>
+              <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" class="form-control" placeholder="Min. 6 characters" minlength="6" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem;">Create Account</button>
+            </form>
+          </div>
+
+          <!-- Google Sign In -->
+          <div class="auth-divider">or continue with</div>
+
+          <button type="button" class="btn-google google-signin-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+            Sign in with Google
+          </button>
+
+          <!-- Instant Demo / Guest Mode -->
+          <div class="auth-divider" style="margin: 0.85rem 0;">or explore instantly</div>
+
+          <button type="button" class="btn btn-secondary guest-signin-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600; padding: 0.75rem;">
+            ⚡ Instant Demo / Guest Mode
+          </button>
+
+          <div class="auth-footer-help">
+            <a href="#landing" data-navigate="landing">Want to browse features first? View Overview &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ==================== VIEW 1: LANDING ==================== -->
-    <section id="view-landing" class="app-view active">
+    <section id="view-landing" class="app-view">
       <!-- Hero -->
       <section class="hero">
         <div class="container">

@@ -22,6 +22,11 @@ const App = {
     // Listen to Firebase auth changes to update navigation and dashboard
     AuthService.onStateChange((user) => {
       this.updateAuthUI(user);
+      if (user && this.activeView === 'auth') {
+        const dest = this.intendedRoute || 'dashboard';
+        this.intendedRoute = null;
+        this.navigateTo(dest);
+      }
       if (this.activeView === 'dashboard' || this.activeView === 'history') {
         this.renderHistory();
       }
@@ -30,8 +35,31 @@ const App = {
 
   // ==================== Routing & View Switching ====================
   navigateTo(viewId, pushState = true) {
-    const validViews = ['landing', 'home', 'party', 'jewelry', 'results', 'dashboard', 'history'];
-    if (!validViews.includes(viewId)) viewId = 'landing';
+    // Route aliases for auth screens
+    if (viewId === 'login' || viewId === 'signin') {
+      this.navigateTo('auth', pushState);
+      this.switchAuthTab('signin');
+      return;
+    }
+    if (viewId === 'register' || viewId === 'signup') {
+      this.navigateTo('auth', pushState);
+      this.switchAuthTab('signup');
+      return;
+    }
+
+    const validViews = ['auth', 'landing', 'home', 'party', 'jewelry', 'results', 'dashboard', 'history'];
+    if (!validViews.includes(viewId)) {
+      viewId = AuthService.currentUser ? 'dashboard' : 'auth';
+    }
+
+    // Auth gate for application views
+    const protectedViews = ['dashboard', 'history', 'home', 'party', 'jewelry'];
+    if (protectedViews.includes(viewId) && !AuthService.currentUser) {
+      this.intendedRoute = viewId;
+      this.showToast('Please sign in or continue as Guest to access this planner.', 'info');
+      this.navigateTo('auth', pushState);
+      return;
+    }
 
     this.activeView = viewId;
 
@@ -50,6 +78,12 @@ const App = {
       history.pushState(null, '', `#${viewId}`);
     }
 
+    // Update nav active indicator
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      const linkTarget = link.getAttribute('data-navigate');
+      link.classList.toggle('active', linkTarget === viewId);
+    });
+
     // View-specific initializers
     if (viewId === 'dashboard' || viewId === 'history') {
       this.renderHistory();
@@ -57,11 +91,32 @@ const App = {
   },
 
   handleInitialRoute() {
-    const hash = window.location.hash.replace('#', '') || 'landing';
-    this.navigateTo(hash, false);
+    const rawHash = (window.location.hash.replace('#', '') || '').trim();
+    const user = AuthService.currentUser;
+
+    if (!user) {
+      // First screen for unauthenticated visitors is the Sign In / Sign Up screen!
+      if (rawHash === 'landing' || rawHash === 'overview') {
+        this.navigateTo('landing', false);
+      } else if (rawHash === 'register' || rawHash === 'signup') {
+        this.navigateTo('auth', false);
+        this.switchAuthTab('signup');
+      } else {
+        // Default entry screen is Sign In
+        this.navigateTo('auth', false);
+        this.switchAuthTab('signin');
+      }
+    } else {
+      // Authenticated user gets directed straight to dashboard or requested planner
+      if (!rawHash || rawHash === 'auth' || rawHash === 'login' || rawHash === 'register' || rawHash === 'landing') {
+        this.navigateTo('dashboard', false);
+      } else {
+        this.navigateTo(rawHash, false);
+      }
+    }
 
     window.addEventListener('popstate', () => {
-      const h = window.location.hash.replace('#', '') || 'landing';
+      const h = window.location.hash.replace('#', '') || (AuthService.currentUser ? 'dashboard' : 'auth');
       this.navigateTo(h, false);
     });
   },
@@ -139,10 +194,11 @@ const App = {
           submitBtn.disabled = true;
           submitBtn.innerHTML = 'Signing in...';
           await AuthService.login(email, pass);
-          authModal.classList.remove('modal-open');
+          if (authModal) authModal.classList.remove('modal-open');
           this.showToast('Welcome back! Successfully signed in.', 'success');
-          // Navigate to dashboard per spec Section 0.4
-          this.navigateTo('dashboard');
+          const destination = this.intendedRoute || 'dashboard';
+          this.intendedRoute = null;
+          this.navigateTo(destination);
         } catch (err) {
           this.showToast(err.message || 'Login failed. Please check credentials.', 'error');
         } finally {
@@ -166,10 +222,11 @@ const App = {
           submitBtn.disabled = true;
           submitBtn.innerHTML = 'Creating account...';
           await AuthService.register(email, pass, name);
-          authModal.classList.remove('modal-open');
+          if (authModal) authModal.classList.remove('modal-open');
           this.showToast('Account created successfully!', 'success');
-          // Navigate to dashboard per spec Section 0.4
-          this.navigateTo('dashboard');
+          const destination = this.intendedRoute || 'dashboard';
+          this.intendedRoute = null;
+          this.navigateTo(destination);
         } catch (err) {
           this.showToast(err.message || 'Registration failed.', 'error');
         } finally {
@@ -187,9 +244,11 @@ const App = {
           btn.disabled = true;
           const user = await AuthService.loginWithGoogle();
           if (user) {
-            authModal.classList.remove('modal-open');
+            if (authModal) authModal.classList.remove('modal-open');
             this.showToast('Signed in with Google!', 'success');
-            this.navigateTo('dashboard');
+            const destination = this.intendedRoute || 'dashboard';
+            this.intendedRoute = null;
+            this.navigateTo(destination);
           }
         } catch (err) {
           console.error("Google Sign-In Error:", err);
@@ -217,9 +276,11 @@ const App = {
         try {
           btn.disabled = true;
           await AuthService.loginAsGuest();
-          authModal.classList.remove('modal-open');
+          if (authModal) authModal.classList.remove('modal-open');
           this.showToast('Logged in as Guest! Full access enabled.', 'success');
-          this.navigateTo('dashboard');
+          const destination = this.intendedRoute || 'dashboard';
+          this.intendedRoute = null;
+          this.navigateTo(destination);
         } catch (err) {
           this.showToast('Could not start guest session.', 'error');
         } finally {
@@ -228,14 +289,14 @@ const App = {
       });
     });
 
-    // Logout -> redirects to Landing
+    // Logout -> redirects to Sign In screen
     const logoutBtns = document.querySelectorAll('.logout-btn');
     logoutBtns.forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         await AuthService.logout();
         this.showToast('Signed out successfully.', 'info');
-        this.navigateTo('landing');
+        this.navigateTo('auth');
       });
     });
   },
@@ -244,8 +305,12 @@ const App = {
     document.querySelectorAll('[data-auth-tab]').forEach(btn => {
       btn.classList.toggle('active', btn.getAttribute('data-auth-tab') === tab);
     });
-    document.getElementById('signin-tab-content').style.display = tab === 'signin' ? 'block' : 'none';
-    document.getElementById('signup-tab-content').style.display = tab === 'signup' ? 'block' : 'none';
+    document.querySelectorAll('#signin-tab-content').forEach(el => {
+      el.style.display = tab === 'signin' ? 'block' : 'none';
+    });
+    document.querySelectorAll('#signup-tab-content').forEach(el => {
+      el.style.display = tab === 'signup' ? 'block' : 'none';
+    });
   },
 
   updateAuthUI(user) {
