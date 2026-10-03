@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Home Interior Results — PocketSmart AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 950px; margin: 3rem auto; padding: 0 1rem;">
+  
+  <!-- Plan Header -->
+  <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 2.25rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+      <div>
+        <span class="badge" style="background: #e0e7ff; color: #4338ca; border: none; font-size: 0.8rem; text-transform: uppercase;">
+          🛋️ Home Interior Plan
+        </span>
+        <h1 style="font-size: 2rem; font-weight: 800; color: var(--dark); margin: 0.35rem 0;">
+          {{ inputs.rooms[0].room_type }} Recommendation
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+          Style: <strong>{{ inputs.preferences }}</strong> • {{ inputs.rooms[0].room_count }} Room(s)
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <a href="/home-planner" class="btn btn-secondary">🔄 Edit Requirements</a>
+        {% if user %}
+        <a href="/history" class="btn btn-secondary">📜 View History</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Budget Overview Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding: 1.5rem; background: var(--gray-50); border-radius: var(--radius-md); border: 1px solid var(--gray-200);">
+      <div>
+        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Total Budget</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--dark);">₹{{ "{:,.2f}".format(plan.budget) }}</div>
+      </div>
+      <div>
+        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Estimated Spend</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary);">₹{{ "{:,.2f}".format(plan.total_estimated_cost) }}</div>
+      </div>
+      <div>
+        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Remaining Surplus</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--success);">₹{{ "{:,.2f}".format(plan.remaining_budget) }}</div>
+      </div>
+    </div>
+
+    <!-- AI Summary -->
+    <div style="margin-top: 1.5rem; color: var(--gray-600); font-size: 0.95rem; line-height: 1.6;">
+      <p><strong>Executive Summary:</strong> {{ plan.summary }}</p>
+    </div>
+  </div>
+
+  <!-- Budget Allocation Breakdown -->
+  {% if plan.allocation %}
+  <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+    <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--dark); margin-bottom: 1.25rem;">Budget Allocation</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+      {% for alloc in plan.allocation %}
+      <div style="padding: 1rem; border: 1px solid var(--gray-100); border-radius: var(--radius-md); background: var(--gray-50);">
+        <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem;">
+          <span>{{ alloc.category }}</span>
+          <span style="color: var(--primary);">₹{{ "{:,.0f}".format(alloc.allocated_budget) }}</span>
+        </div>
+        {% if alloc.percentage %}
+        <div style="background: var(--gray-200); height: 6px; border-radius: 3px; overflow: hidden;">
+          <div style="background: var(--primary); height: 100%; width: {{ alloc.percentage }}%;"></div>
+        </div>
+        <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 0.25rem;">{{ alloc.percentage }}% of total</span>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Recommended Items with Platform Search Links -->
+  <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+    <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--dark); margin-bottom: 1.25rem;">Curated Product Recommendations</h2>
+
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      {% for item in plan.recommendations %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); flex-wrap: wrap; gap: 1rem; transition: transform 0.2s;" class="rec-row">
+        <div style="flex: 1; min-width: 250px;">
+          <span class="badge" style="background: var(--gray-100); color: var(--gray-800); border: none; font-size: 0.75rem; padding: 0.2rem 0.6rem; margin-bottom: 0.4rem;">
+            {{ item.category }}
+          </span>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--dark); margin: 0.2rem 0;">
+            {{ item.name }}
+          </h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+            {{ item.reason }}
+          </p>
+        </div>
+
+        <div style="text-align: right; min-width: 160px;">
+          <div style="font-size: 1.35rem; font-weight: 800; color: var(--dark); margin-bottom: 0.5rem;">
+            ₹{{ "{:,.0f}".format(item.estimated_price) }}
+          </div>
+          {% if item.search_url %}
+          <a href="{{ item.search_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.45rem 1rem;">
+            Find on {{ item.platform }} ↗
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Savings Suggestions -->
+  {% if plan.savings_suggestions %}
+  <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 2rem;">
+    <h3 style="color: #166534; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.75rem;">💡 Smart Cost-Saving Tips</h3>
+    <ul style="list-style: disc; margin-left: 1.5rem; color: #15803d; font-size: 0.95rem; display: flex; flex-direction: column; gap: 0.4rem;">
+      {% for tip in plan.savings_suggestions %}
+      <li>{{ tip }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- Bottom Actions -->
+  <div style="text-align: center; margin: 3rem 0;">
+    <a href="/home-planner" class="btn btn-primary" style="padding: 0.85rem 2rem;">Plan Another Room</a>
+  </div>
+</div>
+{% endblock %}

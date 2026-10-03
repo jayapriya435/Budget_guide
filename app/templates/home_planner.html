@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Home Interior Planner — PocketSmart AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 3rem auto; padding: 0 1rem;">
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <div class="badge" style="background: var(--primary-light); color: var(--primary); border: none;">🛋️ Interior Intelligence</div>
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--dark); margin: 0.5rem 0;">Home Interior Planner</h1>
+    <p style="color: var(--text-secondary); font-size: 1.05rem;">Enter your total budget and room requirements. Gemini AI will optimize allocations and recommend products.</p>
+  </div>
+
+  {% if error %}
+  <div style="background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; padding: 1rem; border-radius: var(--radius-md); margin-bottom: 2rem;">
+    {{ error }}
+  </div>
+  {% endif %}
+
+  <form method="POST" action="/home-recommendations" style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 2.5rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 1.75rem;">
+    
+    <!-- Budget Input -->
+    <div>
+      <label for="budget" style="display: block; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--dark);">
+        Total Interior Budget (INR ₹) <span style="color: #e11d48;">*</span>
+      </label>
+      <input type="number" id="budget" name="budget" min="5000" step="1000" value="50000" required style="width: 100%; padding: 0.85rem 1.25rem; font-size: 1.25rem; font-weight: 700; border: 2px solid var(--primary-light); border-radius: var(--radius-md); font-family: inherit; color: var(--primary);">
+      <small style="color: var(--text-secondary); display: block; margin-top: 0.35rem;">e.g., ₹50,000 for a living room upgrade or ₹2,00,000 for a full apartment.</small>
+    </div>
+
+    <!-- Room Selection -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+      <div>
+        <label for="room_type" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Primary Room Type</label>
+        <select id="room_type" name="room_type" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit; background: white;">
+          <option value="Living Room" selected>Living Room</option>
+          <option value="Master Bedroom">Master Bedroom</option>
+          <option value="Dining Room">Dining Room</option>
+          <option value="Home Office / Study">Home Office / Study</option>
+          <option value="Balcony / Outdoor">Balcony / Outdoor</option>
+          <option value="Entire 1BHK">Entire 1BHK</option>
+          <option value="Entire 2BHK">Entire 2BHK</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="room_count" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Number of Rooms</label>
+        <input type="number" id="room_count" name="room_count" min="1" max="10" value="1" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit;">
+      </div>
+    </div>
+
+    <!-- Essential Quantities -->
+    <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 1.5rem;">
+      <h3 style="font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 1rem;">Room Item Quantities</h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+        <div>
+          <label for="lights_count" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Lights / Lamps</label>
+          <input type="number" id="lights_count" name="lights_count" min="0" max="20" value="4" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md);">
+        </div>
+
+        <div>
+          <label for="fans_count" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Ceiling Fans</label>
+          <input type="number" id="fans_count" name="fans_count" min="0" max="10" value="1" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md);">
+        </div>
+
+        <div>
+          <label for="sofa_requirement" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Sofa / Seating</label>
+          <select id="sofa_requirement" name="sofa_requirement" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); background: white;">
+            <option value="None">None</option>
+            <option value="Single Recliner">Single Recliner</option>
+            <option value="2-Seater Compact">2-Seater Compact</option>
+            <option value="3-Seater" selected>3-Seater</option>
+            <option value="L-Shape Sectional">L-Shape Sectional</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="dining_table" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Dining Table</label>
+          <select id="dining_table" name="dining_table" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); background: white;">
+            <option value="None" selected>None</option>
+            <option value="2-Seater Bistro">2-Seater Bistro</option>
+            <option value="4-Seater Wooden">4-Seater Wooden</option>
+            <option value="6-Seater Glass/Wood">6-Seater Glass/Wood</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Style & Preferences -->
+    <div>
+      <label for="style_preference" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Design Style Preference</label>
+      <select id="style_preference" name="style_preference" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit; background: white;">
+        <option value="Modern Minimalist" selected>Modern Minimalist (Clean lines, neutral tones)</option>
+        <option value="Contemporary Indian">Contemporary Indian (Warm woods, brass accents)</option>
+        <option value="Scandinavian Boho">Scandinavian Boho (Light wood, pastels, plants)</option>
+        <option value="Industrial Chic">Industrial Chic (Metal, dark wood, exposed bulbs)</option>
+        <option value="Traditional Heritage">Traditional Heritage (Carved wood, rich textiles)</option>
+      </select>
+    </div>
+
+    <!-- Additional Notes -->
+    <div>
+      <label for="additional_notes" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Special Requests or Constraints (Optional)</label>
+      <textarea id="additional_notes" name="additional_notes" rows="3" placeholder="e.g. Need pet-friendly fabric, prefer warm lighting, compact room dimensions." style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem; resize: vertical;"></textarea>
+    </div>
+
+    <!-- Submit CTA -->
+    <button type="submit" class="btn btn-primary" id="btn-generate-home" style="padding: 1rem; font-size: 1.1rem; width: 100%; margin-top: 0.5rem;">
+      ✨ Generate Smart Home Interior Plan
+    </button>
+  </form>
+</div>
+{% endblock %}

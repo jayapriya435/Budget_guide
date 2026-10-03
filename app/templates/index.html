@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}PocketSmart AI — Your Smart Budget & Recommendation Assistant{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+  <div class="container">
+    <div class="badge">✨ Next-Gen Budget Intelligence</div>
+    <h1>Plan Smarter. Spend Better.<br><span class="gradient-text">Powered by Gemini AI</span></h1>
+    <p>PocketSmart AI turns your budget into personalized, actionable shopping & service recommendations for Home Interiors, Events, and Jewelry.</p>
+    <div class="hero-actions">
+      <a href="/register" class="btn btn-primary" id="cta-get-started">Start Planning Free</a>
+      <a href="#planners" class="btn btn-secondary" id="cta-explore">Explore Planners</a>
+    </div>
+  </div>
+</section>
+
+<!-- Planners Section -->
+<section class="section" id="planners">
+  <div class="container">
+    <div class="section-header">
+      <h2>Explore AI Planners</h2>
+      <p>Select your goal, specify your exact budget and preferences, and let our intelligent engine optimize every rupee.</p>
+    </div>
+
+    <div class="grid-3">
+      <!-- Home Interior Card -->
+      <div class="card" id="card-home-planner">
+        <div class="card-icon icon-home">🛋️</div>
+        <h3>Home Interior Planner</h3>
+        <p>Design your dream space without blowing your budget. Get room-by-room allocations and curated furniture, lighting, and decor.</p>
+        <ul class="card-features">
+          <li><span>✓</span> Dynamic room & furniture breakdown</li>
+          <li><span>✓</span> Lighting & appliances allocation</li>
+          <li><span>✓</span> Direct links to Amazon, Flipkart & IKEA</li>
+        </ul>
+        <a href="/home-planner" class="btn btn-secondary">Open Home Planner &rarr;</a>
+      </div>
+
+      <!-- Party Planner Card -->
+      <div class="card" id="card-party-planner">
+        <div class="card-icon icon-party">🎉</div>
+        <h3>Party & Event Planner</h3>
+        <p>Host unforgettable birthdays, corporate parties, or weddings. We distribute your budget across catering, venue, decor, and entertainment.</p>
+        <ul class="card-features">
+          <li><span>✓</span> Guest-count calibrated budgeting</li>
+          <li><span>✓</span> Catering & venue recommendations</li>
+          <li><span>✓</span> Swiggy, Zomato & OYO search links</li>
+        </ul>
+        <a href="/party-planner" class="btn btn-secondary">Open Party Planner &rarr;</a>
+      </div>
+
+      <!-- Jewelry Planner Card -->
+      <div class="card" id="card-jewelry-planner">
+        <div class="card-icon icon-jewelry">💎</div>
+        <h3>Jewelry Planner</h3>
+        <p>Multimodal AI matching. Describe your style or upload an outfit picture to find matching necklaces, earrings, and accessories.</p>
+        <ul class="card-features">
+          <li><span>✓</span> Outfit image color & style analysis</li>
+          <li><span>✓</span> Occasion-specific matching (Weddings, Galas)</li>
+          <li><span>✓</span> Curated shopping recommendations</li>
+        </ul>
+        <a href="/jewelry-planner" class="btn btn-secondary">Open Jewelry Planner &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="section how-it-works" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <h2>How PocketSmart AI Works</h2>
+      <p>Three simple steps from budget constraint to complete shopping list.</p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <h4>Set Your Budget</h4>
+        <p>Enter your target spend limit and specify the items, rooms, or occasion details you need.</p>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <h4>AI Calculates & Curates</h4>
+        <p>Gemini AI breaks down allocations mathematically and matches products within each sub-budget.</p>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <h4>Save & Purchase</h4>
+        <p>Review recommendations, check verified platform links, save plans to your history, and buy with confidence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="section" id="testimonials">
+  <div class="container">
+    <div class="section-header">
+      <h2>Loved by Smart Planners</h2>
+      <p>See how real users furnished homes and hosted parties without overspending.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Furnished my 2BHK living room with a strict ₹60,000 budget. PocketSmart AI gave me exact sofa and lighting options with money left over."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">AP</div>
+          <div class="author-info">
+            <h5>Ananya P.</h5>
+            <span>Bangalore • Home Planner</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"Organized a 50-person corporate celebration. The catering and venue suggestions saved us at least ₹25,000 compared to external event agencies."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">RK</div>
+          <div class="author-info">
+            <h5>Rahul K.</h5>
+            <span>Hyderabad • Party Planner</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <p class="testimonial-quote">"I uploaded a picture of my wedding reception lehenga and it recommended jewelry that matched the emerald undertones perfectly within my budget."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">SM</div>
+          <div class="author-info">
+            <h5>Sneha M.</h5>
+            <span>Mumbai • Jewelry Planner</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

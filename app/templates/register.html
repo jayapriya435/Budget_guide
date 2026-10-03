@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Create Your Account — PocketSmart AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 480px; margin: 4rem auto; padding: 2.5rem; background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow-xl);">
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <h2 style="font-size: 1.85rem; font-weight: 800; color: var(--dark); margin-bottom: 0.5rem;">Create Your Account</h2>
+    <p style="color: var(--text-secondary); font-size: 0.95rem;">Join PocketSmart AI and optimize your spending with Gemini.</p>
+  </div>
+
+  {% if error %}
+  <div style="background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.9rem; margin-bottom: 1.5rem;">
+    {{ error }}
+  </div>
+  {% endif %}
+
+  <form method="POST" action="/register" style="display: flex; flex-direction: column; gap: 1.25rem;">
+    <div>
+      <label for="name" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; color: var(--dark);">Full Name</label>
+      <input type="text" id="name" name="name" required placeholder="Alex Smith" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit;">
+    </div>
+
+    <div>
+      <label for="email" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; color: var(--dark);">Email Address</label>
+      <input type="email" id="email" name="email" required placeholder="alex@example.com" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit;">
+    </div>
+
+    <div>
+      <label for="password" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; color: var(--dark);">Password (min 6 characters)</label>
+      <input type="password" id="password" name="password" minlength="6" required placeholder="••••••••" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit;">
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem; margin-top: 0.5rem;">
+      Create Account
+    </button>
+  </form>
+
+  <p style="text-align: center; margin-top: 2rem; font-size: 0.9rem; color: var(--text-secondary);">
+    Already have an account? <a href="/login" style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign In</a>
+  </p>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Recommendation History — PocketSmart AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 950px; margin: 3rem auto; padding: 0 1rem;">
+  
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--dark); margin-bottom: 0.25rem;">
+        Recommendation History
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 1rem;">
+        Revisit and reload your previously generated AI budget plans.
+      </p>
+    </div>
+
+    <a href="/dashboard" class="btn btn-secondary">
+      &larr; Back to Dashboard
+    </a>
+  </div>
+
+  {% if records %}
+  <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+    {% for rec in records %}
+    <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 1.75rem; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+      <div style="flex: 1; min-width: 280px;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          {% if rec.planner_type == 'home' %}
+            <span class="badge" style="background: #e0e7ff; color: #4338ca; border: none; font-size: 0.75rem;">🛋️ HOME INTERIOR</span>
+          {% elif rec.planner_type == 'party' %}
+            <span class="badge" style="background: #fef3c7; color: #b45309; border: none; font-size: 0.75rem;">🎉 PARTY PLAN</span>
+          {% else %}
+            <span class="badge" style="background: #fce7f3; color: #be185d; border: none; font-size: 0.75rem;">💎 JEWELRY</span>
+          {% endif %}
+          <span style="color: var(--text-secondary); font-size: 0.85rem;">{{ rec.created_at.strftime('%d %B %Y, %I:%M %p') }}</span>
+        </div>
+
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--dark); margin-bottom: 0.35rem;">
+          {{ rec.title or (rec.planner_type | capitalize ~ ' Budget Plan') }}
+        </h3>
+        
+        <p style="color: var(--gray-600); font-size: 0.95rem;">
+          Allocated Budget: <strong style="color: var(--dark);">₹{{ "{:,.2f}".format(rec.budget) }}</strong>
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <a href="/recommendation-details/{{ rec.id }}" class="btn btn-primary" style="font-size: 0.9rem; padding: 0.6rem 1.2rem;">
+          View Full Plan &rarr;
+        </a>
+        <a href="/delete-recommendation/{{ rec.id }}" onclick="return confirm('Are you sure you want to delete this saved plan?');" class="btn btn-secondary" style="font-size: 0.9rem; padding: 0.6rem 1rem; color: #dc2626; border-color: #fecaca;">
+          🗑️
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <!-- Empty State -->
+  <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 4rem 2rem; text-align: center; box-shadow: var(--shadow-sm);">
+    <div style="font-size: 3.5rem; margin-bottom: 1rem;">📜</div>
+    <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">No Saved Recommendations Yet</h2>
+    <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto 2rem; font-size: 0.95rem;">
+      When you generate budget plans using any of the planners, they will automatically be saved here so you can review and reload them anytime.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="/home-planner" class="btn btn-primary">🛋️ Home Planner</a>
+      <a href="/party-planner" class="btn btn-primary" style="background: linear-gradient(135deg, #d97706, #f59e0b);">🎉 Party Planner</a>
+      <a href="/jewelry-planner" class="btn btn-primary" style="background: linear-gradient(135deg, #be185d, #ec4899);">💎 Jewelry Planner</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

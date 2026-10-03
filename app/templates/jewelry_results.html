@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Jewelry Recommendations — PocketSmart AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 950px; margin: 3rem auto; padding: 0 1rem;">
+  
+  <!-- Plan Header -->
+  <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 2.25rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+      <div>
+        <span class="badge" style="background: #fce7f3; color: #be185d; border: none; font-size: 0.8rem; text-transform: uppercase;">
+          💎 Jewelry Stylist
+        </span>
+        <h1 style="font-size: 2rem; font-weight: 800; color: var(--dark); margin: 0.35rem 0;">
+          {{ inputs.occasion }} Styling
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+          Style: <strong>{{ inputs.style }}</strong> • Desired: {{ inputs.jewelry_types }}
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <a href="/jewelry-planner" class="btn btn-secondary">🔄 Change Outfit/Budget</a>
+        {% if user %}
+        <a href="/history" class="btn btn-secondary">📜 View History</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Visual Outfit Card if image was uploaded -->
+    {% if image_url or inputs.image_url %}
+    <div style="display: flex; align-items: center; gap: 1.5rem; background: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;">
+      <img src="{{ image_url or inputs.image_url }}" alt="Uploaded Outfit" style="width: 100px; height: 100px; object-fit: cover; border-radius: var(--radius-md); border: 2px solid white; box-shadow: var(--shadow-sm);">
+      <div>
+        <h4 style="color: #9f1239; font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">Vision AI Outfit Analysis</h4>
+        <p style="color: #be123c; font-size: 0.9rem; line-height: 1.4;">
+          {{ inputs.outfit_description if inputs.outfit_description else 'Gemini analyzed the uploaded outfit tones and neckline to match pieces below.' }}
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Budget Overview Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding: 1.5rem; background: var(--gray-50); border-radius: var(--radius-md); border: 1px solid var(--gray-200);">
+      <div>
+        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Total Budget</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--dark);">₹{{ "{:,.2f}".format(plan.budget) }}</div>
+      </div>
+      <div>
+        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Curated Total</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: #be185d;">₹{{ "{:,.2f}".format(plan.total_estimated_cost) }}</div>
+      </div>
+      <div>
+        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Remaining Budget</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--success);">₹{{ "{:,.2f}".format(plan.remaining_budget) }}</div>
+      </div>
+    </div>
+
+    <!-- AI Summary -->
+    <div style="margin-top: 1.5rem; color: var(--gray-600); font-size: 0.95rem; line-height: 1.6;">
+      <p><strong>Stylist Note:</strong> {{ plan.summary }}</p>
+    </div>
+  </div>
+
+  <!-- Budget Allocation Breakdown -->
+  {% if plan.allocation %}
+  <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+    <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--dark); margin-bottom: 1.25rem;">Budget Allocation</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+      {% for alloc in plan.allocation %}
+      <div style="padding: 1rem; border: 1px solid var(--gray-100); border-radius: var(--radius-md); background: var(--gray-50);">
+        <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem;">
+          <span>{{ alloc.category }}</span>
+          <span style="color: #be185d;">₹{{ "{:,.0f}".format(alloc.allocated_budget) }}</span>
+        </div>
+        {% if alloc.percentage %}
+        <div style="background: var(--gray-200); height: 6px; border-radius: 3px; overflow: hidden;">
+          <div style="background: #ec4899; height: 100%; width: {{ alloc.percentage }}%;"></div>
+        </div>
+        <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 0.25rem;">{{ alloc.percentage }}% of total</span>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Curated Jewelry Pieces -->
+  <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+    <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--dark); margin-bottom: 1.25rem;">Curated Jewelry Recommendations</h2>
+
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      {% for item in plan.recommendations %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); flex-wrap: wrap; gap: 1rem;">
+        <div style="flex: 1; min-width: 250px;">
+          <span class="badge" style="background: #fce7f3; color: #be185d; border: none; font-size: 0.75rem; padding: 0.2rem 0.6rem; margin-bottom: 0.4rem;">
+            {{ item.category }}
+          </span>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--dark); margin: 0.2rem 0;">
+            {{ item.name }}
+          </h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+            {{ item.reason }}
+          </p>
+        </div>
+
+        <div style="text-align: right; min-width: 160px;">
+          <div style="font-size: 1.35rem; font-weight: 800; color: var(--dark); margin-bottom: 0.5rem;">
+            ₹{{ "{:,.0f}".format(item.estimated_price) }}
+          </div>
+          {% if item.search_url %}
+          <a href="{{ item.search_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.45rem 1rem;">
+            Shop on {{ item.platform }} ↗
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Savings Suggestions -->
+  {% if plan.savings_suggestions %}
+  <div style="background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 2rem;">
+    <h3 style="color: #9d174d; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.75rem;">💡 Jewelry Styling & Savings Advice</h3>
+    <ul style="list-style: disc; margin-left: 1.5rem; color: #be185d; font-size: 0.95rem; display: flex; flex-direction: column; gap: 0.4rem;">
+      {% for tip in plan.savings_suggestions %}
+      <li>{{ tip }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- Bottom CTA -->
+  <div style="text-align: center; margin: 3rem 0;">
+    <a href="/jewelry-planner" class="btn btn-primary" style="padding: 0.85rem 2rem; background: linear-gradient(135deg, #be185d, #ec4899);">
+      Style Another Outfit
+    </a>
+  </div>
+</div>
+{% endblock %}

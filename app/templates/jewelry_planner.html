@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Jewelry Planner (Multimodal AI) — PocketSmart AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 3rem auto; padding: 0 1rem;">
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <div class="badge" style="background: #fce7f3; color: #be185d; border: none;">💎 Multimodal Fashion Stylist</div>
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--dark); margin: 0.5rem 0;">Jewelry & Styling Planner</h1>
+    <p style="color: var(--text-secondary); font-size: 1.05rem;">Match jewelry to your outfit, occasion, and spending limit. Upload your outfit photo for AI vision color-coordination.</p>
+  </div>
+
+  {% if error %}
+  <div style="background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; padding: 1rem; border-radius: var(--radius-md); margin-bottom: 2rem;">
+    {{ error }}
+  </div>
+  {% endif %}
+
+  <form method="POST" action="/jewelry-recommendations" enctype="multipart/form-data" style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 2.5rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 1.75rem;">
+    
+    <!-- Budget Input -->
+    <div>
+      <label for="budget" style="display: block; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--dark);">
+        Total Jewelry Budget (INR ₹) <span style="color: #e11d48;">*</span>
+      </label>
+      <input type="number" id="budget" name="budget" min="1000" step="500" value="15000" required style="width: 100%; padding: 0.85rem 1.25rem; font-size: 1.25rem; font-weight: 700; border: 2px solid #fce7f3; border-radius: var(--radius-md); font-family: inherit; color: #be185d;">
+    </div>
+
+    <!-- Occasion and Style -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+      <div>
+        <label for="occasion" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Occasion</label>
+        <select id="occasion" name="occasion" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit; background: white;">
+          <option value="Wedding Reception" selected>Wedding Reception</option>
+          <option value="Sangeet / Mehendi">Sangeet / Mehendi</option>
+          <option value="Cocktail / Evening Gala">Cocktail / Evening Gala</option>
+          <option value="Festive / Diwali">Festive / Diwali</option>
+          <option value="Engagement Ceremony">Engagement Ceremony</option>
+          <option value="Everyday / Office Wear">Everyday / Office Wear</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="style" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Style Preference</label>
+        <select id="style" name="style" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit; background: white;">
+          <option value="Traditional Kundan & Polki" selected>Traditional Kundan & Polki</option>
+          <option value="Temple Antique Gold">Temple Antique Gold</option>
+          <option value="Modern Minimalist Rose Gold">Modern Minimalist Rose Gold</option>
+          <option value="Diamond / Cubic Zirconia Statement">Diamond / Cubic Zirconia Statement</option>
+          <option value="Oxidised Silver Boho">Oxidised Silver Boho</option>
+          <option value="Pearl Elegance">Pearl Elegance</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Jewelry Categories -->
+    <div>
+      <label for="jewelry_types" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Desired Jewelry Pieces</label>
+      <input type="text" id="jewelry_types" name="jewelry_types" value="Necklace, Earrings, Bangles" placeholder="e.g. Necklace, Jhumkas, Maang Tikka, Ring" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit;">
+    </div>
+
+    <!-- Outfit Description -->
+    <div>
+      <label for="outfit_description" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Outfit Description</label>
+      <textarea id="outfit_description" name="outfit_description" rows="2" placeholder="e.g. Royal blue lehenga with silver zardozi embroidery and sweetheart neckline." style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem; resize: vertical;"></textarea>
+    </div>
+
+    <!-- Multimodal Outfit Image Upload -->
+    <div style="background: #fdf2f8; border: 2px dashed #f472b6; border-radius: var(--radius-md); padding: 1.75rem; text-align: center;">
+      <div style="font-size: 2rem; margin-bottom: 0.5rem;">📸</div>
+      <label for="outfit_image" style="display: block; font-weight: 700; font-size: 1rem; color: #9d174d; margin-bottom: 0.25rem; cursor: pointer;">
+        Upload Outfit Photo (Optional)
+      </label>
+      <p style="color: #be185d; font-size: 0.85rem; margin-bottom: 1rem;">
+        Gemini AI will inspect neckline, colors, and metal accents to generate precision style matches. (JPEG, PNG, WebP up to 5MB)
+      </p>
+      <input type="file" id="outfit_image" name="outfit_image" accept="image/png, image/jpeg, image/webp" style="margin: 0 auto; display: block; font-size: 0.9rem;" onchange="previewImage(event)">
+      
+      <div id="image-preview-container" style="display: none; margin-top: 1.25rem;">
+        <img id="image-preview" src="#" alt="Outfit preview" style="max-height: 200px; border-radius: var(--radius-md); box-shadow: var(--shadow-md); border: 2px solid white;">
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-primary" id="btn-generate-jewelry" style="padding: 1rem; font-size: 1.1rem; width: 100%; margin-top: 0.5rem; background: linear-gradient(135deg, #be185d, #ec4899);">
+      💎 Generate Smart Jewelry Recommendations
+    </button>
+  </form>
+</div>
+
+<script>
+function previewImage(event) {
+  const container = document.getElementById("image-preview-container");
+  const img = document.getElementById("image-preview");
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      img.src = e.target.result;
+      container.style.display = "block";
+    }
+    reader.readAsDataURL(file);
+  } else {
+    container.style.display = "none";
+  }
+}
+</script>
+{% endblock %}

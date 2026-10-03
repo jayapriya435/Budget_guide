@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Party & Event Planner — PocketSmart AI{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 3rem auto; padding: 0 1rem;">
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <div class="badge" style="background: #fef3c7; color: #b45309; border: none;">🎉 Event Intelligence</div>
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--dark); margin: 0.5rem 0;">Party & Event Planner</h1>
+    <p style="color: var(--text-secondary); font-size: 1.05rem;">Host memorable events on any budget. Gemini AI calculates per-head allocations and curates catering, venue, and decor.</p>
+  </div>
+
+  {% if error %}
+  <div style="background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; padding: 1rem; border-radius: var(--radius-md); margin-bottom: 2rem;">
+    {{ error }}
+  </div>
+  {% endif %}
+
+  <form method="POST" action="/party-recommendations" style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 2.5rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 1.75rem;">
+    
+    <!-- Budget and Guest Count -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+      <div>
+        <label for="budget" style="display: block; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--dark);">
+          Total Event Budget (INR ₹) <span style="color: #e11d48;">*</span>
+        </label>
+        <input type="number" id="budget" name="budget" min="5000" step="1000" value="50000" required style="width: 100%; padding: 0.85rem 1.25rem; font-size: 1.25rem; font-weight: 700; border: 2px solid #fef3c7; border-radius: var(--radius-md); font-family: inherit; color: #b45309;">
+      </div>
+
+      <div>
+        <label for="guest_count" style="display: block; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--dark);">
+          Number of Guests <span style="color: #e11d48;">*</span>
+        </label>
+        <input type="number" id="guest_count" name="guest_count" min="1" max="1000" value="30" required style="width: 100%; padding: 0.85rem 1.25rem; font-size: 1.25rem; font-weight: 700; border: 2px solid var(--gray-200); border-radius: var(--radius-md); font-family: inherit;">
+      </div>
+    </div>
+
+    <!-- Event Type and Venue -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+      <div>
+        <label for="event_type" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Event Type</label>
+        <select id="event_type" name="event_type" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit; background: white;">
+          <option value="Birthday Party" selected>Birthday Party</option>
+          <option value="Corporate Celebration / Team Outing">Corporate Celebration</option>
+          <option value="Wedding Reception / Sangeet">Wedding Reception / Sangeet</option>
+          <option value="Anniversary Gathering">Anniversary Gathering</option>
+          <option value="Housewarming Party">Housewarming Party</option>
+          <option value="Festival / Diwali Get-together">Festival / Diwali Get-together</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="venue_type" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Venue Arrangement</label>
+        <select id="venue_type" name="venue_type" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit; background: white;">
+          <option value="Home / Backyard" selected>Home / Backyard (₹0 venue cost)</option>
+          <option value="Community Hall / Clubhouse">Community Hall / Clubhouse</option>
+          <option value="Rooftop Cafe / Restaurant">Rooftop Cafe / Restaurant</option>
+          <option value="Banquet Hall / Hotel">Banquet Hall / Hotel</option>
+          <option value="Resort / Farmhouse">Resort / Farmhouse</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Catering Preference -->
+    <div>
+      <label for="food_preference" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Food & Catering Preference</label>
+      <select id="food_preference" name="food_preference" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit; background: white;">
+        <option value="Mixed Veg & Non-Veg Buffet (Starters, Main, Dessert)" selected>Mixed Veg & Non-Veg Buffet (Starters, Main, Dessert)</option>
+        <option value="Pure Vegetarian Feast">Pure Vegetarian Feast</option>
+        <option value="High Tea & Finger Food / Canapes">High Tea & Finger Food / Canapes</option>
+        <option value="Live BBQ & Snacks Counter">Live BBQ & Snacks Counter</option>
+        <option value="Potluck / Self-Arranged Drinks & Desserts">Potluck / Self-Arranged Drinks & Desserts</option>
+      </select>
+    </div>
+
+    <!-- Decor & Entertainment -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+      <div>
+        <label for="decor_preference" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Decoration Style</label>
+        <select id="decor_preference" name="decor_preference" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit; background: white;">
+          <option value="Theme Balloon Arch & Fairy Lights" selected>Theme Balloon Arch & Fairy Lights</option>
+          <option value="Minimal Floral Accents">Minimal Floral Accents</option>
+          <option value="Grand Festive Stage Backdrop">Grand Festive Stage Backdrop</option>
+          <option value="DIY Eco-Friendly Paper Lanterns">DIY Eco-Friendly Paper Lanterns</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="entertainment" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Entertainment</label>
+        <select id="entertainment" name="entertainment" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-size: 0.95rem; font-family: inherit; background: white;">
+          <option value="Music Playlist & Interactive Party Games" selected>Music Playlist & Interactive Party Games</option>
+          <option value="Live DJ & Sound System">Live DJ & Sound System</option>
+          <option value="Emcee / Party Host / Magician">Emcee / Party Host / Magician</option>
+          <option value="Background Acoustic Music">Background Acoustic Music</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Additional Requirements -->
+    <div>
+      <label for="additional_notes" style="display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--dark);">Special Notes (Optional)</label>
+      <textarea id="additional_notes" name="additional_notes" rows="3" placeholder="e.g. Include 1kg custom chocolate cake, kid-friendly food items, photobooth corner." style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-200); border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem; resize: vertical;"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary" id="btn-generate-party" style="padding: 1rem; font-size: 1.1rem; width: 100%; margin-top: 0.5rem; background: linear-gradient(135deg, #d97706, #f59e0b);">
+      🎉 Generate Smart Party Plan
+    </button>
+  </form>
+</div>
+{% endblock %}

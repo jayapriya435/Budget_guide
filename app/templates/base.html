@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PocketSmart AI — Smart Budget & Recommendation Assistant{% endblock %}</title>
+  <meta name="description" content="AI-driven budget planning and recommendation assistant for Home Interior, Party Planning, and Jewelry.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="brand" id="brand-logo">
+        <div class="brand-icon">⚡</div>
+        <span>PocketSmart <span class="accent">AI</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/#planners">Planners</a></li>
+        <li><a href="/#how-it-works">How It Works</a></li>
+        <li><a href="/#testimonials">Testimonials</a></li>
+        {% if user %}
+          <li><a href="/dashboard">Dashboard</a></li>
+          <li><a href="/history">History</a></li>
+          <li><a href="/logout" class="btn btn-secondary">Logout</a></li>
+        {% else %}
+          <li><a href="/login">Sign In</a></li>
+          <li><a href="/register" class="btn btn-primary">Get Started</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <p>&copy; 2026 PocketSmart AI. Budget-aware recommendation assistant.</p>
+      <ul class="footer-links">
+        <li><a href="/#planners">Planners</a></li>
+        <li><a href="/docs" target="_blank">API Docs</a></li>
+        <li><a href="/privacy">Privacy Policy</a></li>
+        <li><a href="/terms">Terms of Service</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- AI Generation Loading Overlay (Phase 15.2) -->
+  <div id="ai-loading-overlay" class="loading-overlay">
+    <div class="loading-modal">
+      <div class="loading-spinner"></div>
+      <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--dark); margin-bottom: 0.5rem;">
+        Creating Your Smart Plan ✨
+      </h3>
+      <p id="loading-step-text" style="color: var(--text-secondary); font-size: 0.95rem; min-height: 1.5rem; margin-bottom: 1.25rem;">
+        Analyzing budget and room specifications...
+      </p>
+      <div class="loading-bar-track">
+        <div id="loading-bar-fill" class="loading-bar-fill"></div>
+      </div>
+      <span style="font-size: 0.75rem; color: var(--gray-400); display: block; margin-top: 1rem;">
+        PocketSmart AI • Gemini Intelligence
+      </span>
+    </div>
+  </div>
+
+  <script src="/static/js/main.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
